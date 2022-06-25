@@ -5,10 +5,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -17,6 +17,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 public class LearningSet {
 
     @Id
@@ -28,12 +29,16 @@ public class LearningSet {
 
     private LocalDateTime creationTime;
 
+    @Column(length = 2)
     private String termLanguage;
 
+    @Column(length = 2)
     private String translationLanguage;
 
-    @PrePersist
-    public void prePersist() {
-        creationTime = LocalDateTime.now();
+    public LearningSet(boolean publiclyVisible, String termLanguage, String translationLanguage) {
+        this.publiclyVisible = publiclyVisible;
+        this.termLanguage = termLanguage;
+        this.translationLanguage = translationLanguage;
+        this.creationTime = LocalDateTime.now();
     }
 }
