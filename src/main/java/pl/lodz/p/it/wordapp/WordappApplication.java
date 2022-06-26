@@ -4,7 +4,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.annotation.Order;
 import pl.lodz.p.it.wordapp.model.LearningSet;
 import pl.lodz.p.it.wordapp.repository.LearningSetRepository;
 
@@ -17,11 +16,13 @@ public class WordappApplication {
     }
 
     @Bean
-    @Order(1)
-    public CommandLineRunner initLearningSets(LearningSetRepository learningSetRepository) {
+    public CommandLineRunner init(LearningSetRepository learningSetRepository) {
         return args -> {
-            learningSetRepository.save(new LearningSet(true, "DE", "PL"));
-            learningSetRepository.save(new LearningSet(false, "DE", "EN"));
+            LearningSet ls1 = new LearningSet(true, "DE", "PL");
+            LearningSet ls2 = new LearningSet(false, "DE", "EN");
+
+            learningSetRepository.save(ls1);
+            learningSetRepository.save(ls2);
         };
     }
 }
