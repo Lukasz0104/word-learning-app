@@ -5,11 +5,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -22,28 +22,29 @@ import lombok.ToString;
 public class LearningSet {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID", nullable = false)
     private Long id;
 
+    @Column(name = "PUBLICLY_VISIBLE")
     private boolean publiclyVisible;
 
+    @Column(name = "CREATION_TIME")
+    @JsonIgnore
     private final LocalDateTime creationTime;
 
-    @Column(length = 2)
+    @Column(name = "TERM_LANGUAGE", length = 2)
     private String termLanguage;
 
-    @Column(length = 2)
+    @Column(name = "TRANSLATION_LANGUGE", length = 2)
     private String translationLanguage;
 
-    public LearningSet() {
-        this.creationTime = LocalDateTime.now();
-    }
+    @ManyToOne
+    @JoinColumn(name = "AUTHOR_ID")
+    @JsonIgnore
+    private Account author;
 
-    public LearningSet(boolean publiclyVisible, String termLanguage, String translationLanguage) {
-        this.publiclyVisible = publiclyVisible;
-        this.termLanguage = termLanguage;
-        this.translationLanguage = translationLanguage;
+    public LearningSet() {
         this.creationTime = LocalDateTime.now();
     }
 }

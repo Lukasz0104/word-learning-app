@@ -3,9 +3,9 @@ package pl.lodz.p.it.wordapp.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -18,17 +18,19 @@ import lombok.ToString;
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(nullable = false)
+    @GeneratedValue
+    @Column(name = "ID", nullable = false)
     private Long id;
 
-    @Column(unique = true)
+    @Column(name = "USERNAME", unique = true)
     private String userName;
 
-    @Column(unique = true)
+    @Column(name = "EMAIL", unique = true)
     private String emailAddress;
 
     @ToString.Exclude
+    @JsonIgnore
+    @Column(name = "PASSWORD", nullable = false)
     private String password;
 
 }

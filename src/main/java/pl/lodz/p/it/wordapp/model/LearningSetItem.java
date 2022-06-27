@@ -1,11 +1,10 @@
 package pl.lodz.p.it.wordapp.model;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,26 +13,25 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "learning_set_item")
+@Table(name = "LEARNING_SET_ITEM")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @ToString
-@IdClass(LearningSetItemKey.class)
 public class LearningSetItem {
 
-    @Id
-    @Column(nullable = false)
-    private Long setID;
+    @EmbeddedId
+    private LearningSetItemKey learningSetItemKey;
 
-    @Id
-    @Column(nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long itemID;
-
+    @Column(name = "TERM")
     private String term;
 
+    @Column(name = "TRANSLATION")
     private String translation;
+
+    @MapsId("setID")
+    @ManyToOne
+    private LearningSet set;
 
 }
