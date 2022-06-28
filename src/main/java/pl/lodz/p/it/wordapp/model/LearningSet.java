@@ -5,20 +5,21 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import pl.lodz.p.it.wordapp.controller.dto.LearningSetDto;
 
 @Entity
 @Table(name = "LEARNING_SET")
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
 public class LearningSet {
 
     @Id
@@ -39,12 +40,18 @@ public class LearningSet {
     @Column(name = "TRANSLATION_LANGUGE", length = 2)
     private String translationLanguage;
 
-    @ManyToOne
-    @JoinColumn(name = "AUTHOR_ID")
-    @JsonIgnore
-    private Account author;
+    // @ManyToOne
+    // @JoinColumn(name = "AUTHOR_ID", updatable = false, insertable = false)
+    // private Account author;
 
     public LearningSet() {
+        this.creationTime = LocalDateTime.now();
+    }
+
+    public LearningSet(LearningSetDto learningSetDto) {
+        this.publiclyVisible = learningSetDto.isPubliclyVisible();
+        this.termLanguage = learningSetDto.getTermLanguage();
+        this.translationLanguage = learningSetDto.getTranslationLanguage();
         this.creationTime = LocalDateTime.now();
     }
 }

@@ -1,7 +1,14 @@
 package pl.lodz.p.it.wordapp.repository;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import pl.lodz.p.it.wordapp.controller.dto.LearningSetDto;
 import pl.lodz.p.it.wordapp.model.LearningSet;
 
-public interface LearningSetRepository extends PagingAndSortingRepository<LearningSet, Long> {
+public interface LearningSetRepository extends JpaRepository<LearningSet, Long> {
+
+    List<LearningSetDto> findAllBy();
+
+    Optional<LearningSetDto> findDistinctById(Long id);
 }
