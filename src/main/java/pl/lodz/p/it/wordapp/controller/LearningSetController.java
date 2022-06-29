@@ -3,9 +3,11 @@ package pl.lodz.p.it.wordapp.controller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -38,6 +40,38 @@ public class LearningSetController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public LearningSetDto create(@RequestBody LearningSetDto learningSetDto) {
-        return new LearningSetDto(repository.save(new LearningSet(learningSetDto)));
+        LearningSet ls = new LearningSet(learningSetDto);
+        // TODO set current user
+        return new LearningSetDto(repository.save(ls));
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void remove(@PathVariable Long id) {
+        if (repository.existsById(id)) {
+            repository.deleteById(id);
+        } else {
+            throw new LearningSetNotFoundException(id);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public LearningSetDto update(
+            @RequestBody LearningSetDto dto,
+            @PathVariable Long id) {
+
+        LearningSet updated = repository
+                .findById(id)
+                .map(ls -> {
+                    ls.setPubliclyVisible(dto.isPubliclyVisible());
+                    ls.setTitle(dto.getTitle());
+                    ls.setTermLanguage(dto.getTermLanguage());
+                    ls.setTranslationLanguage(dto.getTranslationLanguage());
+
+                    return repository.save(ls);
+                })
+                .orElseThrow(() -> new LearningSetNotFoundException(id));
+
+        return new LearningSetDto(updated);
     }
 }
