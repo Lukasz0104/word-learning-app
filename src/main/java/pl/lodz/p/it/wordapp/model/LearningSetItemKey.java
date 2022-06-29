@@ -23,4 +23,9 @@ public class LearningSetItemKey implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ITEM_ID")
     private Long itemID;
+
+    public LearningSetItemKey(Long setID, Long itemID) {
+        this.setID = setID;
+        this.itemID = itemID;
+    }
 }

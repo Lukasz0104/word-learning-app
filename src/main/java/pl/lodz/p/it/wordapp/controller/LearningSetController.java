@@ -26,8 +26,8 @@ public class LearningSetController {
 
     @GetMapping
     public List<LearningSetDto> all() {
-        return repository.
-                findAllBy();
+        return repository
+                .findAllBy();
     }
 
     @GetMapping("/{id}")
