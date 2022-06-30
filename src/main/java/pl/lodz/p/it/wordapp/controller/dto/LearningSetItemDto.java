@@ -2,14 +2,16 @@ package pl.lodz.p.it.wordapp.controller.dto;
 
 import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import pl.lodz.p.it.wordapp.model.LearningSetItem;
 
-@AllArgsConstructor
-@Setter
 @Getter
+@Setter
+@AllArgsConstructor
+@JsonPropertyOrder({"setID", "itemID", "term", "translation"})
 public class LearningSetItemDto implements Serializable {
 
     @JsonProperty("setID")

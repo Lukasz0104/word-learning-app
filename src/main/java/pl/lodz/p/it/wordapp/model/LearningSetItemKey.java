@@ -2,16 +2,16 @@ package pl.lodz.p.it.wordapp.model;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import java.io.Serializable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 @EqualsAndHashCode
 @NoArgsConstructor
 @Embeddable
@@ -20,7 +20,7 @@ public class LearningSetItemKey implements Serializable {
     @Column(name = "SET_ID", insertable = false, updatable = false)
     private Long setID;
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ITEM_ID")
     private Long itemID;
 

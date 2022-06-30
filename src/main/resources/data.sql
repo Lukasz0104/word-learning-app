@@ -7,11 +7,11 @@ INSERT INTO LEARNING_SET
 VALUES ('niemieckie słówka', NOW(), TRUE, 'DE', 'PL'),
        ('animals in german', NOW(), FALSE, 'DE', 'EN');
 
-INSERT INTO LEARNING_SET_ITEM (SET_ID, TERM, TRANSLATION)
-VALUES (1, 'hallo', 'cześć'),
-       (2, 'e Katze', 'cat'),
-       (1, 'r Hund', 'dog'),
-       (1, 'ja', 'tak'),
-       (1, 'nein', 'nie'),
-       (2, 'r Vogel', 'bird'),
-       (2, 'e Kuhe', 'cow');
+INSERT INTO LEARNING_SET_ITEM (SET_ID, ITEM_ID, TERM, TRANSLATION)
+VALUES (1, 1, 'hallo', 'cześć'),
+       (2, 1, 'e Katze', 'cat'),
+       (1, 2, 'r Hund', 'dog'),
+       (1, 3, 'ja', 'tak'),
+       (1, 4, 'nein', 'nie'),
+       (2, 2, 'r Vogel', 'bird'),
+       (2, 3, 'e Kuhe', 'cow');
