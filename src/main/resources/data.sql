@@ -3,7 +3,7 @@ VALUES ('user1', 'user1@a.com', 'abc'),
        ('user2', 'user2@b.com', 'cba');
 
 INSERT INTO LEARNING_SET
-(TITLE, CREATION_TIME, PUBLICLY_VISIBLE, TERM_LANGUAGE, TRANSLATION_LANGUGE)
+(TITLE, CREATION_TIME, PUBLICLY_VISIBLE, TERM_LANGUAGE, TRANSLATION_LANGUAGE)
 VALUES ('niemieckie słówka', NOW(), TRUE, 'DE', 'PL'),
        ('animals in german', NOW(), FALSE, 'DE', 'EN');
 

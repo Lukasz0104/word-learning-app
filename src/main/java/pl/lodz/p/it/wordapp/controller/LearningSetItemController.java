@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import pl.lodz.p.it.wordapp.controller.dto.CreateLearningSetItemDto;
 import pl.lodz.p.it.wordapp.controller.dto.LearningSetItemDto;
 import pl.lodz.p.it.wordapp.exception.LearningSetItemNotFoundException;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
@@ -59,7 +60,7 @@ public class LearningSetItemController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public LearningSetItemDto create(
-            @RequestBody LearningSetItemDto dto,
+            @RequestBody CreateLearningSetItemDto dto,
             @PathVariable Long setID) {
 
         LearningSet ls = setRepository
@@ -68,8 +69,7 @@ public class LearningSetItemController {
 
         Long itemID = itemRepository.findNextId(setID);
 
-        dto.setLearningSetItemKeySetID(setID);
-        LearningSetItem lsi = new LearningSetItem(dto, itemID);
+        LearningSetItem lsi = CreateLearningSetItemDto.mapToLearningSetItem(dto, setID, itemID);
         lsi.setSet(ls);
 
         LearningSetItem created = itemRepository.save(lsi);
@@ -77,7 +77,7 @@ public class LearningSetItemController {
     }
 
     @PutMapping("/{itemID}")
-    public LearningSetItemDto replace(@RequestBody LearningSetItemDto dto,
+    public LearningSetItemDto replace(@RequestBody CreateLearningSetItemDto dto,
                                       @PathVariable Long setID,
                                       @PathVariable Long itemID) {
 

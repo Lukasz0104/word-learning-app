@@ -13,10 +13,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import pl.lodz.p.it.wordapp.controller.dto.LearningSetDto;
 
 @Entity
 @Table(name = "LEARNING_SET")
@@ -24,6 +25,8 @@ import pl.lodz.p.it.wordapp.controller.dto.LearningSetDto;
 @Setter
 @ToString
 @AllArgsConstructor
+@Builder
+@NoArgsConstructor
 public class LearningSet {
 
     @Id
@@ -39,12 +42,12 @@ public class LearningSet {
 
     @Column(name = "CREATION_TIME")
     @JsonIgnore
-    private final LocalDateTime creationTime;
+    private final LocalDateTime creationTime = LocalDateTime.now();
 
     @Column(name = "TERM_LANGUAGE", length = 2)
     private String termLanguage;
 
-    @Column(name = "TRANSLATION_LANGUGE", length = 2)
+    @Column(name = "TRANSLATION_LANGUAGE", length = 2)
     private String translationLanguage;
 
     // @ManyToOne
@@ -55,16 +58,4 @@ public class LearningSet {
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "SET_ID", updatable = false, insertable = false)
     private List<LearningSetItem> items;
-
-    public LearningSet() {
-        this.creationTime = LocalDateTime.now();
-    }
-
-    public LearningSet(LearningSetDto learningSetDto) {
-        this.publiclyVisible = learningSetDto.isPubliclyVisible();
-        this.termLanguage = learningSetDto.getTermLanguage();
-        this.translationLanguage = learningSetDto.getTranslationLanguage();
-        this.title = learningSetDto.getTitle();
-        this.creationTime = LocalDateTime.now();
-    }
 }

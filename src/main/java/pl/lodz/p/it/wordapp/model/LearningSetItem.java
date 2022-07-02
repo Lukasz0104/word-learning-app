@@ -9,11 +9,11 @@ import javax.persistence.MapsId;
 import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import pl.lodz.p.it.wordapp.controller.dto.LearningSetItemDto;
 
 @Entity
 @Table(name = "LEARNING_SET_ITEM")
@@ -22,6 +22,7 @@ import pl.lodz.p.it.wordapp.controller.dto.LearningSetItemDto;
 @Getter
 @Setter
 @ToString
+@Builder
 public class LearningSetItem {
 
     @EmbeddedId
@@ -38,11 +39,4 @@ public class LearningSetItem {
     @ToString.Exclude
     @JsonIgnore
     private LearningSet set;
-
-    public LearningSetItem(LearningSetItemDto dto, Long itemID) {
-        this.learningSetItemKey = new LearningSetItemKey(dto.getLearningSetItemKeySetID(), itemID);
-        this.term = dto.getTerm();
-        this.translation = dto.getTranslation();
-    }
-
 }

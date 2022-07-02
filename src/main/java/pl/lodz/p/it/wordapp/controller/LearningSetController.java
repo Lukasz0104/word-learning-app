@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import pl.lodz.p.it.wordapp.controller.dto.LearningSetDto;
+import pl.lodz.p.it.wordapp.controller.dto.CreateLearningSetDto;
+import pl.lodz.p.it.wordapp.controller.dto.LearningSetDetailsDto;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
 import pl.lodz.p.it.wordapp.model.LearningSet;
 import pl.lodz.p.it.wordapp.repository.LearningSetRepository;
@@ -25,13 +26,13 @@ public class LearningSetController {
     private final LearningSetRepository repository;
 
     @GetMapping
-    public List<LearningSetDto> all() {
+    public List<LearningSetDetailsDto> all() {
         return repository
                 .findAllBy();
     }
 
     @GetMapping("/{id}")
-    public LearningSetDto one(@PathVariable Long id) {
+    public LearningSetDetailsDto one(@PathVariable Long id) {
         return repository
                 .findDistinctById(id)
                 .orElseThrow(() -> new LearningSetNotFoundException(id));
@@ -39,10 +40,10 @@ public class LearningSetController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public LearningSetDto create(@RequestBody LearningSetDto learningSetDto) {
-        LearningSet ls = new LearningSet(learningSetDto);
+    public LearningSetDetailsDto create(@RequestBody CreateLearningSetDto createLearningSetDto) {
+        LearningSet ls = CreateLearningSetDto.mapToLearningSet(createLearningSetDto);
         // TODO set current user
-        return new LearningSetDto(repository.save(ls));
+        return new LearningSetDetailsDto(repository.save(ls));
     }
 
     @DeleteMapping("/{id}")
@@ -56,8 +57,8 @@ public class LearningSetController {
     }
 
     @PutMapping("/{id}")
-    public LearningSetDto update(
-            @RequestBody LearningSetDto dto,
+    public LearningSetDetailsDto update(
+            @RequestBody CreateLearningSetDto dto,
             @PathVariable Long id) {
 
         LearningSet updated = repository
@@ -72,6 +73,6 @@ public class LearningSetController {
                 })
                 .orElseThrow(() -> new LearningSetNotFoundException(id));
 
-        return new LearningSetDto(updated);
+        return new LearningSetDetailsDto(updated);
     }
 }
