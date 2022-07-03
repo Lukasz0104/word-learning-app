@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Formula;
 
 @Entity
 @Table(name = "LEARNING_SET")
@@ -53,6 +54,9 @@ public class LearningSet {
     // @ManyToOne
     // @JoinColumn(name = "AUTHOR_ID", updatable = false, insertable = false)
     // private Account author;
+
+    @Formula("(SELECT COUNT(*) FROM LEARNING_SET_ITEM LSI WHERE LSI.SET_ID = id)")
+    private int itemCount;
 
     @ToString.Exclude
     @OneToMany(cascade = CascadeType.REMOVE)
