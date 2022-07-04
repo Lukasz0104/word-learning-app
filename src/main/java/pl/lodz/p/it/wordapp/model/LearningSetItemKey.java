@@ -20,7 +20,6 @@ public class LearningSetItemKey implements Serializable {
     @Column(name = "SET_ID", insertable = false, updatable = false)
     private Long setID;
 
-    // @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ITEM_ID")
     private Long itemID;
 
