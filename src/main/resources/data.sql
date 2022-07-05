@@ -1,6 +1,6 @@
-INSERT INTO ACCOUNT (USERNAME, EMAIL, PASSWORD)
-VALUES ('user1', 'user1@a.com', 'abc'),
-       ('user2', 'user2@b.com', 'cba');
+-- INSERT INTO ACCOUNT (USERNAME, EMAIL, PASSWORD)
+-- VALUES ('user1', 'user1@a.com', 'abc'),
+--        ('user2', 'user2@b.com', 'cba');
 
 INSERT INTO LEARNING_SET
 (TITLE, CREATION_TIME, PUBLICLY_VISIBLE, TERM_LANGUAGE, TRANSLATION_LANGUAGE)
