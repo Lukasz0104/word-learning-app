@@ -23,7 +23,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public void register(@RequestBody RegistrationDto registrationDto) {
         accountRepository.save(registrationDto.mapToAccount(encoder));
     }
