@@ -16,7 +16,8 @@ public class JsonObjectAuthenticationFilter extends UsernamePasswordAuthenticati
     private final ObjectMapper objectMapper;
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
+    public Authentication attemptAuthentication(HttpServletRequest request,
+                                                HttpServletResponse response) {
         try {
             BufferedReader reader = request.getReader();
             StringBuilder sb = new StringBuilder();
