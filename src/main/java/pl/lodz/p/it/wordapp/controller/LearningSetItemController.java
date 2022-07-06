@@ -1,6 +1,7 @@
 package pl.lodz.p.it.wordapp.controller;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +26,7 @@ import pl.lodz.p.it.wordapp.repository.LearningSetRepository;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/sets/{setID}/items")
+@SecurityRequirement(name = "bearerAuth")
 public class LearningSetItemController {
 
     private final LearningSetRepository setRepository;
