@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.wordapp.controller.dto.CreateLearningSetDto;
@@ -28,9 +29,24 @@ public class LearningSetController {
     private final LearningSetRepository repository;
 
     @GetMapping
-    public List<LearningSetDetailsDto> all() {
-        return repository
-                .findAllBy();
+    public List<LearningSetDetailsDto> all(
+            @RequestParam(name = "termLanguages", required = false) List<String> termLanguages,
+            @RequestParam(name = "translationLanguages", required = false) List<String> translationLanguages) {
+        if (termLanguages != null && termLanguages.size() > 0) {
+            if (translationLanguages != null && translationLanguages.size() > 0) {
+                return repository
+                        .findByTermLanguageInIgnoreCaseAndTranslationLanguageInIgnoreCase(termLanguages, translationLanguages);
+            } else {
+                return repository
+                        .findByTermLanguageInIgnoreCase(termLanguages);
+            }
+        } else {
+            if (translationLanguages != null && translationLanguages.size() > 0) {
+                return repository
+                        .findByTranslationLanguageInIgnoreCase(translationLanguages);
+            }
+            return repository.findAllBy();
+        }
     }
 
     @GetMapping("/{id}")
