@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import pl.lodz.p.it.wordapp.controller.dto.LoginCredentials;
 
 @RequiredArgsConstructor
 public class JsonObjectAuthenticationFilter extends UsernamePasswordAuthenticationFilter {

@@ -1,4 +1,4 @@
-package pl.lodz.p.it.wordapp.config;
+package pl.lodz.p.it.wordapp.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

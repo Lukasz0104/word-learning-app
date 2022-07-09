@@ -1,4 +1,4 @@
-package pl.lodz.p.it.wordapp.config;
+package pl.lodz.p.it.wordapp.controller.dto;
 
 import lombok.Getter;
 
