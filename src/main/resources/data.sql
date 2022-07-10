@@ -6,8 +6,8 @@ VALUES ('user1', 'user1@a.com',
 
 INSERT INTO LEARNING_SET
 (TITLE, CREATION_TIME, PUBLICLY_VISIBLE, TERM_LANGUAGE, TRANSLATION_LANGUAGE)
-VALUES ('niemieckie słówka', NOW(), TRUE, 'DE', 'PL'),
-       ('animals in german', NOW(), FALSE, 'DE', 'EN');
+VALUES ('niemieckie słówka', NOW(), TRUE, 'de', 'pl'),
+       ('animals in german', NOW(), FALSE, 'de', 'en');
 
 INSERT INTO LEARNING_SET_ITEM (SET_ID, ITEM_ID, TERM, TRANSLATION)
 VALUES (1, 1, 'hallo', 'cześć'),

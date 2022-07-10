@@ -1,5 +1,6 @@
 package pl.lodz.p.it.wordapp.controller;
 
+import javax.validation.Valid;
 import java.util.List;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -32,10 +33,12 @@ public class LearningSetController {
     public List<LearningSetDetailsDto> all(
             @RequestParam(name = "termLanguages", required = false) List<String> termLanguages,
             @RequestParam(name = "translationLanguages", required = false) List<String> translationLanguages) {
+
         if (termLanguages != null && termLanguages.size() > 0) {
             if (translationLanguages != null && translationLanguages.size() > 0) {
                 return repository
-                        .findByTermLanguageInIgnoreCaseAndTranslationLanguageInIgnoreCase(termLanguages, translationLanguages);
+                        .findByTermLanguageInIgnoreCaseAndTranslationLanguageInIgnoreCase(
+                                termLanguages, translationLanguages);
             } else {
                 return repository
                         .findByTermLanguageInIgnoreCase(termLanguages);
@@ -58,7 +61,8 @@ public class LearningSetController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public LearningSetDetailsDto create(@RequestBody CreateLearningSetDto createLearningSetDto) {
+    public LearningSetDetailsDto create(
+            @Valid @RequestBody CreateLearningSetDto createLearningSetDto) {
         LearningSet ls = CreateLearningSetDto.mapToLearningSet(createLearningSetDto);
         // TODO set current user
         return new LearningSetDetailsDto(repository.save(ls));
@@ -75,8 +79,8 @@ public class LearningSetController {
     }
 
     @PutMapping("/{id}")
-    public LearningSetDetailsDto update(
-            @RequestBody CreateLearningSetDto dto,
+    public LearningSetDetailsDto replace(
+            @Valid @RequestBody CreateLearningSetDto dto,
             @PathVariable Long id) {
 
         LearningSet updated = repository

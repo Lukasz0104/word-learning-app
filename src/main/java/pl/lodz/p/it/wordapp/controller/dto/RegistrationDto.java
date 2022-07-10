@@ -1,5 +1,8 @@
 package pl.lodz.p.it.wordapp.controller.dto;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,8 +15,15 @@ import pl.lodz.p.it.wordapp.model.Account;
 @Getter
 @Setter
 public class RegistrationDto {
+    @NotBlank(message = "Username must not be empty")
     private String username;
+
+    @NotBlank(message = "Email must not be empty")
+    @Email(message = "You must give a valid email address")
     private String emailAddress;
+
+    @NotBlank(message = "Password must not be empty")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
     public Account mapToAccount(PasswordEncoder encoder) {

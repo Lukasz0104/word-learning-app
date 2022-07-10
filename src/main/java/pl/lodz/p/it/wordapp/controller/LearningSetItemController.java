@@ -1,5 +1,6 @@
 package pl.lodz.p.it.wordapp.controller;
 
+import javax.validation.Valid;
 import java.util.List;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -44,9 +45,9 @@ public class LearningSetItemController {
     }
 
     @GetMapping("/{itemID}")
-    public LearningSetItemDto one(
-            @PathVariable Long setID,
-            @PathVariable Long itemID) throws LearningSetNotFoundException {
+    public LearningSetItemDto one(@PathVariable Long setID,
+                                  @PathVariable Long itemID)
+            throws LearningSetNotFoundException {
 
         if (!setRepository.existsById(setID)) {
             throw new LearningSetNotFoundException(setID);
@@ -62,7 +63,7 @@ public class LearningSetItemController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public LearningSetItemDto create(
-            @RequestBody CreateLearningSetItemDto dto,
+            @Valid @RequestBody CreateLearningSetItemDto dto,
             @PathVariable Long setID) {
 
         LearningSet ls = setRepository
@@ -79,9 +80,10 @@ public class LearningSetItemController {
     }
 
     @PutMapping("/{itemID}")
-    public LearningSetItemDto replace(@RequestBody CreateLearningSetItemDto dto,
-                                      @PathVariable Long setID,
-                                      @PathVariable Long itemID) {
+    public LearningSetItemDto replace(
+            @Valid @RequestBody CreateLearningSetItemDto dto,
+            @PathVariable Long setID,
+            @PathVariable Long itemID) {
 
         if (!setRepository.existsById(setID)) {
             throw new LearningSetNotFoundException(setID);

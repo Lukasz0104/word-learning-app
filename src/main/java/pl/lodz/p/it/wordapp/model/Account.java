@@ -6,7 +6,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Arrays;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,15 +31,20 @@ public class Account implements UserDetails {
     @Column(name = "ID", nullable = false)
     private Long id;
 
+    @NotBlank(message = "Username must not be empty")
     @Column(name = "USERNAME", unique = true)
     private String username;
 
     @Column(name = "EMAIL", unique = true)
+    @NotBlank(message = "Email must not be empty")
+    @Email(message = "You must provide a valid email address")
     private String emailAddress;
 
     @ToString.Exclude
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "PASSWORD", nullable = false)
+    @NotBlank(message = "Password must not be empty")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
     @Override

@@ -1,5 +1,6 @@
 package pl.lodz.p.it.wordapp.controller;
 
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,12 +20,12 @@ public class AuthenticationController {
     private final PasswordEncoder encoder;
 
     @PostMapping("/login")
-    public void login(@RequestBody LoginCredentials credentials) {
+    public void login(@Valid @RequestBody LoginCredentials credentials) {
     }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void register(@RequestBody RegistrationDto registrationDto) {
+    public void register(@Valid @RequestBody RegistrationDto registrationDto) {
         accountRepository.save(registrationDto.mapToAccount(encoder));
     }
 
