@@ -5,6 +5,8 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.wordapp.controller.dto.CreateLearningSetDto;
 import pl.lodz.p.it.wordapp.controller.dto.LearningSetDetailsDto;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
+import pl.lodz.p.it.wordapp.model.Account;
 import pl.lodz.p.it.wordapp.model.LearningSet;
 import pl.lodz.p.it.wordapp.repository.LearningSetRepository;
 
@@ -34,22 +37,49 @@ public class LearningSetController {
             @RequestParam(name = "termLanguages", required = false) List<String> termLanguages,
             @RequestParam(name = "translationLanguages", required = false) List<String> translationLanguages) {
 
-        if (termLanguages != null && termLanguages.size() > 0) {
-            if (translationLanguages != null && translationLanguages.size() > 0) {
-                return repository
-                        .findByTermLanguageInIgnoreCaseAndTranslationLanguageInIgnoreCase(
-                                termLanguages, translationLanguages);
-            } else {
-                return repository
-                        .findByTermLanguageInIgnoreCase(termLanguages);
-            }
-        } else {
-            if (translationLanguages != null && translationLanguages.size() > 0) {
-                return repository
-                        .findByTranslationLanguageInIgnoreCase(translationLanguages);
-            }
-            return repository.findAllBy();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = null;
+
+        if (auth.getPrincipal() instanceof Account) {
+            userId = ((Account) auth.getPrincipal()).getId();
         }
+
+        if (termLanguages != null) {
+            termLanguages = termLanguages
+                    .stream()
+                    .map(String::trim)
+                    .map(String::toLowerCase)
+                    .filter(s -> s.matches("^[a-z]{2}$"))
+                    .toList();
+        }
+
+        if (translationLanguages != null) {
+            translationLanguages = translationLanguages
+                    .stream()
+                    .map(String::trim)
+                    .map(String::toLowerCase)
+                    .filter(s -> s.matches("^[a-z]{2}$"))
+                    .toList();
+        }
+
+        return repository.find(userId, termLanguages, translationLanguages);
+
+        // if (termLanguages != null && termLanguages.size() > 0) {
+        //     if (translationLanguages != null && translationLanguages.size() > 0) {
+        //         return repository
+        //                 .findSetsByTermLanguageInAndTranslationLanguageIn(
+        //                         userId, termLanguages, translationLanguages);
+        //     } else {
+        //         return repository
+        //                 .findByTermLanguageIn(userId, termLanguages);
+        //     }
+        // } else {
+        //     if (translationLanguages != null && translationLanguages.size() > 0) {
+        //         return repository
+        //                 .findByTranslationLanguageIn(userId, translationLanguages);
+        //     }
+        //     return repository.findSets(userId);
+        // }
     }
 
     @GetMapping("/{id}")
