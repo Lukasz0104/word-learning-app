@@ -1,7 +1,9 @@
 package pl.lodz.p.it.wordapp.controller;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,8 +36,9 @@ public class LearningSetController {
 
     @GetMapping
     public List<LearningSetDetailsDto> all(
-            @RequestParam(name = "termLanguages", required = false) List<String> termLanguages,
-            @RequestParam(name = "translationLanguages", required = false) List<String> translationLanguages) {
+            @RequestParam(name = "termLanguages", required = false) Collection<String> termLanguages,
+            @RequestParam(name = "translationLanguages", required = false) Collection<String> translationLanguages,
+            @RequestParam(name = "titlePattern", required = false) String titlePattern) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = null;
@@ -50,7 +53,11 @@ public class LearningSetController {
                     .map(String::trim)
                     .map(String::toLowerCase)
                     .filter(s -> s.matches("^[a-z]{2}$"))
-                    .toList();
+                    .collect(Collectors.toSet());
+
+            if (termLanguages.size() == 0) {
+                termLanguages = null;
+            }
         }
 
         if (translationLanguages != null) {
@@ -59,27 +66,14 @@ public class LearningSetController {
                     .map(String::trim)
                     .map(String::toLowerCase)
                     .filter(s -> s.matches("^[a-z]{2}$"))
-                    .toList();
+                    .collect(Collectors.toSet());
+
+            if (translationLanguages.size() == 0) {
+                translationLanguages = null;
+            }
         }
 
-        return repository.find(userId, termLanguages, translationLanguages);
-
-        // if (termLanguages != null && termLanguages.size() > 0) {
-        //     if (translationLanguages != null && translationLanguages.size() > 0) {
-        //         return repository
-        //                 .findSetsByTermLanguageInAndTranslationLanguageIn(
-        //                         userId, termLanguages, translationLanguages);
-        //     } else {
-        //         return repository
-        //                 .findByTermLanguageIn(userId, termLanguages);
-        //     }
-        // } else {
-        //     if (translationLanguages != null && translationLanguages.size() > 0) {
-        //         return repository
-        //                 .findByTranslationLanguageIn(userId, translationLanguages);
-        //     }
-        //     return repository.findSets(userId);
-        // }
+        return repository.find(userId, termLanguages, translationLanguages, titlePattern);
     }
 
     @GetMapping("/{id}")

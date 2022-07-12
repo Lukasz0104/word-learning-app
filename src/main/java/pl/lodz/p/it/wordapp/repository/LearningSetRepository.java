@@ -18,54 +18,13 @@ public interface LearningSetRepository extends JpaRepository<LearningSet, Long> 
             "WHERE ((ls.publiclyVisible = true) " +
             "OR (ls.publiclyVisible = false AND ar.roleValue IS NOT NULL)) " +
             "AND ((?2) IS NULL OR LOWER(ls.termLanguage) IN ?2) " +
-            "AND ((?3) IS NULL OR LOWER(ls.translationLanguage) IN ?3)")
+            "AND ((?3) IS NULL OR LOWER(ls.translationLanguage) IN ?3) " +
+            "AND (?4 IS NULL OR LOWER(ls.title) LIKE CONCAT('%', LOWER(?4), '%'))")
     List<LearningSetDetailsDto> find(
             Long userId,
             @Nullable Collection<String> termLanguages,
-            @Nullable Collection<String> translationLanguages);
-
-    // @Query("SELECT ls " +
-    //         "FROM LearningSet ls " +
-    //         "LEFT JOIN FETCH AccessRole ar " +
-    //         "ON ls.id = ar.set.id AND ar.user.id = ?1 " +
-    //         "WHERE (ls.publiclyVisible = true) " +
-    //         "OR (ls.publiclyVisible = false AND ar.roleValue IS NOT NULL)")
-    // List<LearningSetDetailsDto> findSets(Long userId);
-    //
-    // @Query("SELECT ls " +
-    //         "FROM LearningSet ls " +
-    //         "LEFT JOIN FETCH AccessRole ar " +
-    //         "ON ls.id = ar.set.id AND ar.user.id = ?1 " +
-    //         "WHERE ((ls.publiclyVisible = true) " +
-    //         "OR (ls.publiclyVisible = false AND ar.roleValue IS NOT NULL)) " +
-    //         "AND LOWER(ls.termLanguage) IN ?2 " +
-    //         "AND LOWER(ls.translationLanguage) IN ?3")
-    // List<LearningSetDetailsDto> findSetsByTermLanguageInAndTranslationLanguageIn(
-    //         Long userId,
-    //         Collection<String> termLanguages,
-    //         Collection<String> translationLanguages);
-    //
-    // @Query("SELECT ls " +
-    //         "FROM LearningSet ls " +
-    //         "LEFT JOIN FETCH AccessRole ar " +
-    //         "ON ls.id = ar.set.id AND ar.user.id = ?1 " +
-    //         "WHERE ((ls.publiclyVisible = true) " +
-    //         "OR (ls.publiclyVisible = false AND ar.roleValue IS NOT NULL)) " +
-    //         "AND LOWER(ls.termLanguage) IN ?2")
-    // List<LearningSetDetailsDto> findByTermLanguageIn(
-    //         Long userId,
-    //         Collection<String> termLanguages);
-    //
-    // @Query("SELECT ls " +
-    //         "FROM LearningSet ls " +
-    //         "LEFT JOIN FETCH AccessRole ar " +
-    //         "ON ls.id = ar.set.id AND ar.user.id = ?1 " +
-    //         "WHERE ((ls.publiclyVisible = true) " +
-    //         "OR (ls.publiclyVisible = false AND ar.roleValue IS NOT NULL)) " +
-    //         "AND LOWER(ls.translationLanguage) IN ?2")
-    // List<LearningSetDetailsDto> findByTranslationLanguageIn(
-    //         Long userId,
-    //         Collection<String> translationLanguages);
+            @Nullable Collection<String> translationLanguages,
+            @Nullable String titlePattern);
 
     Optional<LearningSetDetailsDto> findDistinctById(Long id);
 }
