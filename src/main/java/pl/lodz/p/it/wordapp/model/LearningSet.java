@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -15,6 +16,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -69,6 +71,10 @@ public class LearningSet {
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "SET_ID", updatable = false, insertable = false)
     private List<LearningSetItem> items;
+
+    @ToString.Exclude
+    @OneToMany(orphanRemoval = true, mappedBy = "set")
+    private Set<AccessRole> roles;
 
     @PrePersist
     @PreUpdate
