@@ -9,7 +9,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pl.lodz.p.it.wordapp.controller.dto.CreateLearningSetDto;
 import pl.lodz.p.it.wordapp.controller.dto.LearningSetDetailsDto;
+import pl.lodz.p.it.wordapp.exception.LearningSetAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
+import pl.lodz.p.it.wordapp.model.AccessRole;
 import pl.lodz.p.it.wordapp.model.Account;
 import pl.lodz.p.it.wordapp.model.LearningSet;
 import pl.lodz.p.it.wordapp.repository.AccessRoleRepository;
@@ -56,10 +58,19 @@ public class LearningSetService {
         return learningSetRepository.find(userId, termLanguages, translationLanguages, titlePattern);
     }
 
-    public LearningSetDetailsDto findOne(Long id) {
-        return learningSetRepository
+    public LearningSetDetailsDto findOne(Long id) throws LearningSetAccessForbiddenException {
+        Long userId = getCurrentUserId();
+        AccessRole role = accessRoleRepository.findByIdAndUser_Id(id, userId);
+
+        LearningSetDetailsDto ls = learningSetRepository
                 .findDistinctById(id)
                 .orElseThrow(() -> new LearningSetNotFoundException(id));
+
+        if (!ls.isPubliclyVisible() && role == null) {
+            throw new LearningSetAccessForbiddenException(id);
+        }
+
+        return ls;
     }
 
     public LearningSetDetailsDto create(CreateLearningSetDto learningSet) {
@@ -92,6 +103,11 @@ public class LearningSetService {
         }
     }
 
+    /**
+     * Retrieve id of the user, that is currently logged in.
+     *
+     * @return user's ID if user is authenticated, otherwise null.
+     */
     private Long getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Long userId = null;

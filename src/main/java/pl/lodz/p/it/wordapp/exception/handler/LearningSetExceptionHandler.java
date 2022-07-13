@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import pl.lodz.p.it.wordapp.exception.LearningSetAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.LearningSetItemNotFoundException;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
 
@@ -41,6 +42,13 @@ public class LearningSetExceptionHandler {
                     errors.put(fieldName, errorMessage);
                 });
         return errors;
+    }
+
+    @ExceptionHandler(LearningSetAccessForbiddenException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String learningSetAccessForbiddenHandler(LearningSetAccessForbiddenException ex) {
+        return ex.getMessage();
     }
 
 }

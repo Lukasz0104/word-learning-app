@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.wordapp.controller.dto.CreateLearningSetDto;
 import pl.lodz.p.it.wordapp.controller.dto.LearningSetDetailsDto;
+import pl.lodz.p.it.wordapp.exception.LearningSetAccessForbiddenException;
 import pl.lodz.p.it.wordapp.service.LearningSetService;
 
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ public class LearningSetController {
     }
 
     @GetMapping("/{id}")
-    public LearningSetDetailsDto one(@PathVariable Long id) {
+    public LearningSetDetailsDto one(@PathVariable Long id) throws LearningSetAccessForbiddenException {
         return service.findOne(id);
     }
 
