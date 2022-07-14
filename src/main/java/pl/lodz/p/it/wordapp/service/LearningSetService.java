@@ -60,7 +60,7 @@ public class LearningSetService {
 
     public LearningSetDetailsDto findOne(Long id) throws LearningSetAccessForbiddenException {
         Long userId = getCurrentUserId();
-        AccessRole role = accessRoleRepository.findByIdAndUser_Id(id, userId);
+        AccessRole role = accessRoleRepository.findBySet_IdAndUser_Id(id, userId);
 
         LearningSetDetailsDto ls = learningSetRepository
                 .findDistinctById(id)
