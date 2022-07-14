@@ -10,10 +10,12 @@ import org.springframework.stereotype.Service;
 import pl.lodz.p.it.wordapp.controller.dto.CreateLearningSetDto;
 import pl.lodz.p.it.wordapp.controller.dto.LearningSetDetailsDto;
 import pl.lodz.p.it.wordapp.exception.LearningSetAccessForbiddenException;
+import pl.lodz.p.it.wordapp.exception.LearningSetDeletionAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
 import pl.lodz.p.it.wordapp.model.AccessRole;
 import pl.lodz.p.it.wordapp.model.Account;
 import pl.lodz.p.it.wordapp.model.LearningSet;
+import pl.lodz.p.it.wordapp.model.Role;
 import pl.lodz.p.it.wordapp.repository.AccessRoleRepository;
 import pl.lodz.p.it.wordapp.repository.LearningSetRepository;
 
@@ -58,7 +60,7 @@ public class LearningSetService {
         return learningSetRepository.find(userId, termLanguages, translationLanguages, titlePattern);
     }
 
-    public LearningSetDetailsDto findOne(Long id) throws LearningSetAccessForbiddenException {
+    public LearningSetDetailsDto findOne(Long id) {
         Long userId = getCurrentUserId();
         AccessRole role = accessRoleRepository.findBySet_IdAndUser_Id(id, userId);
 
@@ -74,12 +76,22 @@ public class LearningSetService {
     }
 
     public LearningSetDetailsDto create(CreateLearningSetDto learningSet) {
-        // TODO set current user
-        LearningSet ls = CreateLearningSetDto.mapToLearningSet(learningSet);
-        return new LearningSetDetailsDto(learningSetRepository.save(ls));
+        Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        LearningSet persisted = learningSetRepository.save(CreateLearningSetDto.mapToLearningSet(learningSet));
+
+        AccessRole accessRole = new AccessRole(Role.OWNER, persisted, account);
+        accessRoleRepository.save(accessRole);
+        return new LearningSetDetailsDto(persisted);
     }
 
     public LearningSetDetailsDto replace(CreateLearningSetDto learningSet, Long id) {
+        Role role = getUserRoleForSet(id);
+
+        if (role == null || role.compareTo(Role.EDITOR) < 0) { // at least Role.EDITOR is required to make changes
+            throw new LearningSetAccessForbiddenException(id);
+        }
+
         LearningSet updated = learningSetRepository
                 .findById(id)
                 .map(ls -> {
@@ -97,7 +109,14 @@ public class LearningSetService {
 
     public void delete(Long id) {
         if (learningSetRepository.existsById(id)) {
-            learningSetRepository.deleteById(id);
+            Long userId = getCurrentUserId();
+            AccessRole role = accessRoleRepository.findBySet_IdAndUser_Id(id, userId);
+
+            if (role != null && role.getRole() == Role.OWNER) { // only author can delete
+                learningSetRepository.deleteById(id);
+            } else {
+                throw new LearningSetDeletionAccessForbiddenException(id);
+            }
         } else {
             throw new LearningSetNotFoundException(id);
         }
@@ -116,5 +135,12 @@ public class LearningSetService {
             userId = ((Account) auth.getPrincipal()).getId();
         }
         return userId;
+    }
+
+    private Role getUserRoleForSet(Long setId) {
+        Long userId = getCurrentUserId();
+        AccessRole role = accessRoleRepository.findBySet_IdAndUser_Id(setId, userId);
+
+        return (role == null) ? null : role.getRole();
     }
 }

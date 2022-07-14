@@ -23,7 +23,7 @@ public class CreateLearningSetDto {
     @Pattern(regexp = "^\s*[a-z]{2}\s*$", message = "Term language must be a 2 letter language code")
     private String termLanguage;
 
-    @NotBlank(message = "Translation langugae cannot be empty")
+    @NotBlank(message = "Translation language cannot be empty")
     @Pattern(regexp = "^\s*[a-z]{2}\s*$", message = "Translation language must be a 2 letter language code")
     private String translationLanguage;
 

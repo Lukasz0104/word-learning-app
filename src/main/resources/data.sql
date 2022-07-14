@@ -30,8 +30,8 @@ VALUES (20, 1, 1), -- user1 is the owner of set 1
        (15, 1, 2), -- user2 can edit set 1
        (10, 1, 3), -- user3 can propose changes to set 1
        (20, 2, 2), -- user2 is the owner of set 2
-       (5, 2, 1),  -- user1 can read items in set 1
+       (5, 2, 1),  -- user1 can read items in set 2
        (15, 2, 4), -- user4 can edit set 2
        (20, 3, 3), -- user3 is the owner of set 3
-       (5, 3, 1),  -- user1 can view items in set 1
+       (5, 3, 1),  -- user1 can view items in set 3
        (10, 3, 4); -- user4 can propose changes to set 3
