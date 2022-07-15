@@ -2,6 +2,7 @@ package pl.lodz.p.it.wordapp.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -62,13 +63,13 @@ public class LearningSetService {
 
     public LearningSetDetailsDto findOne(Long id) {
         Long userId = getCurrentUserId();
-        AccessRole role = accessRoleRepository.findBySet_IdAndUser_Id(id, userId);
+        Optional<AccessRole> role = accessRoleRepository.findBySet_IdAndUser_Id(id, userId);
 
         LearningSetDetailsDto ls = learningSetRepository
                 .findDistinctById(id)
                 .orElseThrow(() -> new LearningSetNotFoundException(id));
 
-        if (!ls.isPubliclyVisible() && role == null) {
+        if (!ls.isPubliclyVisible() && role.isEmpty()) {
             throw new LearningSetAccessForbiddenException(id);
         }
 
@@ -86,9 +87,10 @@ public class LearningSetService {
     }
 
     public LearningSetDetailsDto replace(CreateLearningSetDto learningSet, Long id) {
-        Role role = getUserRoleForSet(id);
+        Role role = getUserRoleForSet(id)
+                .orElseThrow(() -> new LearningSetAccessForbiddenException(id));
 
-        if (role == null || role.compareTo(Role.EDITOR) < 0) { // at least Role.EDITOR is required to make changes
+        if (role.compareTo(Role.EDITOR) < 0) { // at least Role.EDITOR is required to make changes
             throw new LearningSetAccessForbiddenException(id);
         }
 
@@ -109,10 +111,10 @@ public class LearningSetService {
 
     public void delete(Long id) {
         if (learningSetRepository.existsById(id)) {
-            Long userId = getCurrentUserId();
-            AccessRole role = accessRoleRepository.findBySet_IdAndUser_Id(id, userId);
+            Role role = getUserRoleForSet(id)
+                    .orElseThrow(() -> new LearningSetDeletionAccessForbiddenException(id));
 
-            if (role != null && role.getRole() == Role.OWNER) { // only author can delete
+            if (role == Role.OWNER) { // only author can delete
                 learningSetRepository.deleteById(id);
             } else {
                 throw new LearningSetDeletionAccessForbiddenException(id);
@@ -137,10 +139,10 @@ public class LearningSetService {
         return userId;
     }
 
-    private Role getUserRoleForSet(Long setId) {
+    private Optional<Role> getUserRoleForSet(Long setId) {
         Long userId = getCurrentUserId();
-        AccessRole role = accessRoleRepository.findBySet_IdAndUser_Id(setId, userId);
-
-        return (role == null) ? null : role.getRole();
+        return accessRoleRepository
+                .findBySet_IdAndUser_Id(setId, userId)
+                .map(AccessRole::getRole);
     }
 }
