@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pl.lodz.p.it.wordapp.controller.dto.CreateLearningSetDto;
@@ -32,7 +31,7 @@ public class LearningSetService {
             Collection<String> translationLanguages,
             String titlePattern) {
 
-        Long userId = getCurrentUserId();
+        Long userId = UserService.getCurrentUserId();
 
         if (termLanguages != null) {
             termLanguages = termLanguages
@@ -62,7 +61,7 @@ public class LearningSetService {
     }
 
     public LearningSetDetailsDto findOne(Long id) {
-        Long userId = getCurrentUserId();
+        Long userId = UserService.getCurrentUserId();
         Optional<AccessRole> role = accessRoleRepository.findBySet_IdAndUser_Id(id, userId);
 
         LearningSetDetailsDto ls = learningSetRepository
@@ -124,23 +123,8 @@ public class LearningSetService {
         }
     }
 
-    /**
-     * Retrieve id of the user, that is currently logged in.
-     *
-     * @return user's ID if user is authenticated, otherwise null.
-     */
-    private Long getCurrentUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Long userId = null;
-
-        if (auth.getPrincipal() instanceof Account) {
-            userId = ((Account) auth.getPrincipal()).getId();
-        }
-        return userId;
-    }
-
     private Optional<Role> getUserRoleForSet(Long setId) {
-        Long userId = getCurrentUserId();
+        Long userId = UserService.getCurrentUserId();
         return accessRoleRepository
                 .findBySet_IdAndUser_Id(setId, userId)
                 .map(AccessRole::getRole);
