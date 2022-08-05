@@ -8,14 +8,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.transaction.Transactional;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import pl.lodz.p.it.wordapp.controller.dto.PermissionsDto;
-import pl.lodz.p.it.wordapp.exception.LearningSetAccessForbiddenException;
+import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
+import pl.lodz.p.it.wordapp.exception.PermissionManagementAccessForbiddenException;
+import pl.lodz.p.it.wordapp.exception.PermissionSelfManagementException;
+import pl.lodz.p.it.wordapp.exception.UserNotFoundException;
 import pl.lodz.p.it.wordapp.model.AccessRole;
 import pl.lodz.p.it.wordapp.model.Role;
 import pl.lodz.p.it.wordapp.repository.AccessRoleRepository;
@@ -87,18 +89,19 @@ class LearningSetPermissionServiceTest {
 
     @Test
     @WithUserDetails("user1")
-    void addReadPermissionAsOwnerTest() {
+    void addReadPermissionAsOwnerTest() throws UserNotFoundException,
+        LearningSetNotFoundException, PermissionManagementAccessForbiddenException {
         AccessRole accessRole;
         accessRole = accessRoleRepository
-                .findBySet_IdAndUser_Id(1L, 4L)
-                .orElse(null);
+            .findBySet_IdAndUser_Id(1L, 4L)
+            .orElse(null);
 
         assertNull(accessRole);
 
         permissionService.addReadPermission(1L, 4L);
         accessRole = accessRoleRepository
-                .findBySet_IdAndUser_Id(1L, 4L)
-                .orElse(null);
+            .findBySet_IdAndUser_Id(1L, 4L)
+            .orElse(null);
 
         assertNotNull(accessRole);
         assertEquals(Role.READER, accessRole.getRole());
@@ -113,8 +116,9 @@ class LearningSetPermissionServiceTest {
     @WithUserDetails("user2")
     void addReadPermissionNotAsOwnerTest() {
         assertThrows(
-                LearningSetAccessForbiddenException.class,
-                () -> permissionService.addReadPermission(1L, 4L))
+            PermissionManagementAccessForbiddenException.class,
+            () -> permissionService.addReadPermission(1L, 4L)
+        )
         ;
     }
 
@@ -122,8 +126,8 @@ class LearningSetPermissionServiceTest {
     @WithAnonymousUser
     void addReadPermissionAnonymousUserTest() {
         assertThrows(
-                LearningSetAccessForbiddenException.class,
-                () -> permissionService.addReadPermission(1L, 4L)
+            PermissionManagementAccessForbiddenException.class,
+            () -> permissionService.addReadPermission(1L, 4L)
         );
     }
 
@@ -131,18 +135,19 @@ class LearningSetPermissionServiceTest {
     @WithUserDetails("user1")
     void addReadPermissionNonExistentUserTest() {
         assertThrows(
-                NoSuchElementException.class,
-                () -> permissionService.addReadPermission(1L, 10L)
+            UserNotFoundException.class,
+            () -> permissionService.addReadPermission(1L, 10L)
         );
     }
 
     @Test
     @WithUserDetails("user2")
-    void deleteReadPermissionAsOwnerTest() {
+    void deleteReadPermissionAsOwnerTest()
+        throws PermissionSelfManagementException, PermissionManagementAccessForbiddenException {
         AccessRole accessRole;
         accessRole = accessRoleRepository
-                .findBySet_IdAndUser_Id(2L, 1L)
-                .orElse(null);
+            .findBySet_IdAndUser_Id(2L, 1L)
+            .orElse(null);
 
         assertNotNull(accessRole);
         assertEquals(Role.READER, accessRole.getRole());
@@ -150,8 +155,8 @@ class LearningSetPermissionServiceTest {
         permissionService.deleteAddPermission(2L, 1L);
 
         accessRole = accessRoleRepository
-                .findBySet_IdAndUser_Id(2L, 1L)
-                .orElse(null);
+            .findBySet_IdAndUser_Id(2L, 1L)
+            .orElse(null);
 
         assertNull(accessRole);
     }
@@ -160,19 +165,22 @@ class LearningSetPermissionServiceTest {
     @WithUserDetails("user1")
     void deleteReadPermissionNotAsOwnerTest() {
         assertThrows(
-                LearningSetAccessForbiddenException.class,
-                () -> permissionService.deleteAddPermission(2L, 1L)
+            PermissionManagementAccessForbiddenException.class,
+            () -> permissionService.deleteAddPermission(2L, 1L)
         );
     }
 
     @Test
     @WithUserDetails("user2")
     void deleteReadPermissionFromSelfTest() {
-        permissionService.deleteAddPermission(2L, 2L);
+        assertThrows(
+            PermissionSelfManagementException.class,
+            () -> permissionService.deleteAddPermission(2L, 2L)
+        );
 
         AccessRole accessRole = accessRoleRepository
-                .findBySet_IdAndUser_Id(2L, 2L)
-                .orElse(null);
+            .findBySet_IdAndUser_Id(2L, 2L)
+            .orElse(null);
 
         assertNotNull(accessRole);
         assertEquals(Role.OWNER, accessRole.getRole());

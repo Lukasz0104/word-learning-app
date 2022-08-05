@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.lodz.p.it.wordapp.controller.dto.LearningSetDetailsDto;
 import pl.lodz.p.it.wordapp.controller.dto.PermissionsDto;
-import pl.lodz.p.it.wordapp.exception.LearningSetAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
+import pl.lodz.p.it.wordapp.exception.PermissionManagementAccessForbiddenException;
+import pl.lodz.p.it.wordapp.exception.PermissionSelfManagementException;
+import pl.lodz.p.it.wordapp.exception.UserNotFoundException;
 import pl.lodz.p.it.wordapp.model.AccessRole;
 import pl.lodz.p.it.wordapp.model.Account;
 import pl.lodz.p.it.wordapp.model.LearningSet;
@@ -36,58 +38,58 @@ public class LearningSetPermissionService {
         Long userId = getCurrentUserId();
 
         return accessRoleRepository
-                .findBySet_IdAndUser_Id(setId, userId)
-                .map(PermissionsDto::new)
-                .orElseGet(() -> learningSetRepository
-                        .findDistinctById(setId)
-                        .filter(LearningSetDetailsDto::isPubliclyVisible)
-                        .map(dto -> new PermissionsDto(Role.READER))
-                        .orElseGet(PermissionsDto::new));
+            .findBySet_IdAndUser_Id(setId, userId)
+            .map(PermissionsDto::new)
+            .orElseGet(
+                () -> learningSetRepository
+                    .findDistinctById(setId)
+                    .filter(LearningSetDetailsDto::isPubliclyVisible)
+                    .map(dto -> new PermissionsDto(Role.READER))
+                    .orElseGet(PermissionsDto::new)
+            );
     }
 
     // region READ permission
 
     @Transactional
-    public void addReadPermission(Long setId, Long userId) {
+    public void addReadPermission(Long setId, Long userId)
+        throws PermissionManagementAccessForbiddenException, LearningSetNotFoundException, UserNotFoundException {
         Long requestAuthorId = getCurrentUserId();
         if (isOwner(requestAuthorId, setId)) {
-            AccessRole accessRole = accessRoleRepository
-                    .findBySet_IdAndUser_Id(setId, userId)
-                    .orElse(null);
+            Optional<AccessRole> accessRole = accessRoleRepository
+                .findBySet_IdAndUser_Id(setId, userId);
 
-            if (accessRole == null) {
+            if (accessRole.isEmpty()) {
                 LearningSet ls = learningSetRepository
-                        .findById(setId)
-                        .orElseThrow(() -> new LearningSetNotFoundException(setId));
+                    .findById(setId)
+                    .orElseThrow(() -> new LearningSetNotFoundException(setId));
                 Account acc = accountRepository
-                        .findById(userId)
-                        .orElseThrow(); // TODO create custom exception
+                    .findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException(userId));
 
-                accessRole = new AccessRole(Role.READER, ls, acc);
-                accessRoleRepository.save(accessRole);
+                accessRoleRepository.save(new AccessRole(Role.READER, ls, acc));
             }
         } else {
-            throw new LearningSetAccessForbiddenException(setId); // TODO create specific exception
+            throw new PermissionManagementAccessForbiddenException();
         }
     }
 
     @Transactional
-    public void deleteAddPermission(Long setId, Long userId) {
+    public void deleteAddPermission(Long setId, Long userId)
+        throws PermissionManagementAccessForbiddenException, PermissionSelfManagementException {
         Long requestAuthorId = getCurrentUserId();
 
         if (isOwner(requestAuthorId, setId)) {
-
             if (Objects.equals(requestAuthorId, userId)) {
-                return;
-                // TODO throw custom exception
+                throw new PermissionSelfManagementException();
             }
 
             Optional<AccessRole> accessRole = accessRoleRepository
-                    .findBySet_IdAndUser_Id(setId, userId);
+                .findBySet_IdAndUser_Id(setId, userId);
 
             accessRole.ifPresent(accessRoleRepository::delete);
         } else {
-            throw new LearningSetAccessForbiddenException(setId);
+            throw new PermissionManagementAccessForbiddenException();
         }
     }
 
@@ -97,13 +99,13 @@ public class LearningSetPermissionService {
      * Method veryfing if given user is owner of particular learning set.
      *
      * @param userId ID of the user we want to check permissions of.
-     * @param setId  ID of the learning set.
+     * @param setId ID of the learning set.
      * @return true if user is owner, false otherwise.
      */
     private boolean isOwner(Long userId, Long setId) {
         return accessRoleRepository
-                .findBySet_IdAndUser_Id(setId, userId)
-                .map(ar -> ar.getRole() == Role.OWNER)
-                .orElse(false);
+            .findBySet_IdAndUser_Id(setId, userId)
+            .map(ar -> ar.getRole() == Role.OWNER)
+            .orElse(false);
     }
 }

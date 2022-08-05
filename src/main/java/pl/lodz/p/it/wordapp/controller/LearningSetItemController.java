@@ -35,7 +35,7 @@ public class LearningSetItemController {
 
     @GetMapping
     public List<LearningSetItemDto> all(@PathVariable Long setID)
-            throws LearningSetNotFoundException {
+        throws LearningSetNotFoundException {
 
         if (!setRepository.existsById(setID)) {
             throw new LearningSetNotFoundException(setID);
@@ -47,15 +47,15 @@ public class LearningSetItemController {
     @GetMapping("/{itemID}")
     public LearningSetItemDto one(@PathVariable Long setID,
                                   @PathVariable Long itemID)
-            throws LearningSetNotFoundException {
+        throws LearningSetNotFoundException, LearningSetItemNotFoundException {
 
         if (!setRepository.existsById(setID)) {
             throw new LearningSetNotFoundException(setID);
         }
 
         LearningSetItem item = itemRepository
-                .findById(new LearningSetItemKey(setID, itemID))
-                .orElseThrow(() -> new LearningSetItemNotFoundException(setID, itemID));
+            .findById(new LearningSetItemKey(setID, itemID))
+            .orElseThrow(() -> new LearningSetItemNotFoundException(setID, itemID));
 
         return new LearningSetItemDto(item);
     }
@@ -63,12 +63,12 @@ public class LearningSetItemController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public LearningSetItemDto create(
-            @Valid @RequestBody CreateLearningSetItemDto dto,
-            @PathVariable Long setID) {
+        @Valid @RequestBody CreateLearningSetItemDto dto,
+        @PathVariable Long setID) throws LearningSetNotFoundException {
 
         LearningSet ls = setRepository
-                .findById(setID)
-                .orElseThrow(() -> new LearningSetNotFoundException(setID));
+            .findById(setID)
+            .orElseThrow(() -> new LearningSetNotFoundException(setID));
 
         Long itemID = itemRepository.findNextId(setID);
 
@@ -81,23 +81,23 @@ public class LearningSetItemController {
 
     @PutMapping("/{itemID}")
     public LearningSetItemDto replace(
-            @Valid @RequestBody CreateLearningSetItemDto dto,
-            @PathVariable Long setID,
-            @PathVariable Long itemID) {
+        @Valid @RequestBody CreateLearningSetItemDto dto,
+        @PathVariable Long setID,
+        @PathVariable Long itemID) throws LearningSetNotFoundException, LearningSetItemNotFoundException {
 
         if (!setRepository.existsById(setID)) {
             throw new LearningSetNotFoundException(setID);
         }
 
         LearningSetItem updated = itemRepository
-                .findById(new LearningSetItemKey(setID, itemID))
-                .map(lsi -> {
-                    lsi.setTerm(dto.getTerm());
-                    lsi.setTranslation(dto.getTranslation());
+            .findById(new LearningSetItemKey(setID, itemID))
+            .map(lsi -> {
+                lsi.setTerm(dto.getTerm());
+                lsi.setTranslation(dto.getTranslation());
 
-                    return itemRepository.save(lsi);
-                })
-                .orElseThrow(() -> new LearningSetItemNotFoundException(setID, itemID));
+                return itemRepository.save(lsi);
+            })
+            .orElseThrow(() -> new LearningSetItemNotFoundException(setID, itemID));
 
         return new LearningSetItemDto(updated);
     }
@@ -105,7 +105,8 @@ public class LearningSetItemController {
     @DeleteMapping("/{itemID}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remove(@PathVariable Long setID,
-                       @PathVariable Long itemID) {
+                       @PathVariable Long itemID)
+        throws LearningSetItemNotFoundException, LearningSetNotFoundException {
 
         if (!setRepository.existsById(setID)) {
             throw new LearningSetNotFoundException(setID);

@@ -41,8 +41,9 @@ class LearningSetServiceTest {
 
     @Test
     @WithAnonymousUser
-    void findOneAnonymousUserTest() {
-        LearningSetDetailsDto ls1 = service.findOne(1L);
+    void findOneAnonymousUserTest() throws LearningSetAccessForbiddenException, LearningSetNotFoundException {
+        LearningSetDetailsDto ls1;
+        ls1 = service.findOne(1L);
         assertEquals(ls1.getId(), 1L);
         assertTrue(ls1.isPubliclyVisible());
 
@@ -53,7 +54,7 @@ class LearningSetServiceTest {
 
     @Test
     @WithUserDetails("user1")
-    void findOneForUser1Test() {
+    void findOneForUser1Test() throws LearningSetAccessForbiddenException, LearningSetNotFoundException {
         LearningSetDetailsDto ls1 = service.findOne(1L);
         assertEquals(1L, ls1.getId());
         assertTrue(ls1.isPubliclyVisible());
@@ -72,7 +73,7 @@ class LearningSetServiceTest {
 
     @Test
     @WithUserDetails("user2")
-    void findOneForUser2Test() {
+    void findOneForUser2Test() throws LearningSetAccessForbiddenException, LearningSetNotFoundException {
         LearningSetDetailsDto ls1 = service.findOne(1L);
         assertEquals(1L, ls1.getId());
         assertTrue(ls1.isPubliclyVisible());
@@ -144,7 +145,7 @@ class LearningSetServiceTest {
 
     @Test
     @WithUserDetails("user2")
-    void deleteSuccessTest() throws LearningSetAccessForbiddenException {
+    void deleteSuccessTest() {
         assertDoesNotThrow(() -> service.delete(2L));
         assertThrows(LearningSetNotFoundException.class, () -> service.findOne(2L));
         assertThrows(LearningSetNotFoundException.class, () -> service.delete(2L));
@@ -158,7 +159,7 @@ class LearningSetServiceTest {
 
     @Test
     @WithUserDetails("user2")
-    void replaceOwnerRoleTest() {
+    void replaceAsOwnerTest() throws LearningSetAccessForbiddenException, LearningSetNotFoundException {
         service.replace(updatedLearningSet, 2L);
 
         LearningSetDetailsDto ls = service.findOne(2L);
@@ -170,7 +171,7 @@ class LearningSetServiceTest {
 
     @Test
     @WithUserDetails("user4")
-    void replaceEditorRoleTest() {
+    void replaceAsEditorTest() throws LearningSetAccessForbiddenException, LearningSetNotFoundException {
         service.replace(updatedLearningSet, 2L);
 
         LearningSetDetailsDto ls = service.findOne(2L);
@@ -182,13 +183,13 @@ class LearningSetServiceTest {
 
     @Test
     @WithUserDetails("user3")
-    void replaceProposerRoleTest() {
+    void replaceAsProposerTest() {
         assertThrows(LearningSetAccessForbiddenException.class, () -> service.replace(updatedLearningSet, 2L));
     }
 
     @Test
     @WithUserDetails("user4")
-    void createSetTest() {
+    void createSetTest() throws LearningSetAccessForbiddenException, LearningSetNotFoundException {
         CreateLearningSetDto createLearningSetDto = new CreateLearningSetDto();
         createLearningSetDto.setTitle("new set");
         createLearningSetDto.setTranslationLanguage("es");

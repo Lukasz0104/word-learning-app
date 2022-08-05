@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.wordapp.controller.dto.PermissionsDto;
+import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
+import pl.lodz.p.it.wordapp.exception.PermissionManagementAccessForbiddenException;
+import pl.lodz.p.it.wordapp.exception.PermissionSelfManagementException;
+import pl.lodz.p.it.wordapp.exception.UserNotFoundException;
 import pl.lodz.p.it.wordapp.service.LearningSetPermissionService;
 
 @RequiredArgsConstructor
@@ -27,46 +31,47 @@ public class LearningSetPermissionController {
 
     @PutMapping("/{userId}/read")
     public void addReadPermission(
-            @PathVariable Long setId,
-            @PathVariable Long userId) {
+        @PathVariable Long setId,
+        @PathVariable Long userId)
+        throws UserNotFoundException, LearningSetNotFoundException, PermissionManagementAccessForbiddenException {
         permissionService.addReadPermission(setId, userId);
     }
 
     @PutMapping("/{userId}/propose")
     public void addProposePermission(
-            @PathVariable Long setId,
-            @PathVariable Long userId) {
+        @PathVariable Long setId,
+        @PathVariable Long userId) {
         // TODO
     }
 
     @PutMapping("/{userId}/edit")
     public void addEditPermission(
-            @PathVariable Long setId,
-            @PathVariable Long userId) {
+        @PathVariable Long setId,
+        @PathVariable Long userId) {
         // TODO
     }
 
     @DeleteMapping("/{userId}/read")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteReadPermission(
-            @PathVariable Long setId,
-            @PathVariable Long userId) {
+    public void deleteReadPermission(@PathVariable Long setId,
+                                     @PathVariable Long userId)
+        throws PermissionSelfManagementException, PermissionManagementAccessForbiddenException {
         permissionService.deleteAddPermission(setId, userId);
     }
 
     @DeleteMapping("/{userId}/propose")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProposePermission(
-            @PathVariable Long setId,
-            @PathVariable Long userId) {
+        @PathVariable Long setId,
+        @PathVariable Long userId) {
         // TODO
     }
 
     @DeleteMapping("/{userId}/edit")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteEditPermission(
-            @PathVariable Long setId,
-            @PathVariable Long userId) {
+        @PathVariable Long setId,
+        @PathVariable Long userId) {
         // TODO
     }
 }

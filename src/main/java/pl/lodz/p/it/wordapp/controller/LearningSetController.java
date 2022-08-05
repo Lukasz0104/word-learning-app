@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.wordapp.controller.dto.CreateLearningSetDto;
 import pl.lodz.p.it.wordapp.controller.dto.LearningSetDetailsDto;
 import pl.lodz.p.it.wordapp.exception.LearningSetAccessForbiddenException;
+import pl.lodz.p.it.wordapp.exception.LearningSetDeletionAccessForbiddenException;
+import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
 import pl.lodz.p.it.wordapp.service.LearningSetService;
 
 @RequiredArgsConstructor
@@ -31,35 +33,36 @@ public class LearningSetController {
 
     @GetMapping
     public List<LearningSetDetailsDto> all(
-            @RequestParam(name = "termLanguages", required = false) Collection<String> termLanguages,
-            @RequestParam(name = "translationLanguages", required = false) Collection<String> translationLanguages,
-            @RequestParam(name = "titlePattern", required = false) String titlePattern) {
+        @RequestParam(name = "termLanguages", required = false) Collection<String> termLanguages,
+        @RequestParam(name = "translationLanguages", required = false) Collection<String> translationLanguages,
+        @RequestParam(name = "titlePattern", required = false) String titlePattern) {
 
         return service.findAll(termLanguages, translationLanguages, titlePattern);
     }
 
     @GetMapping("/{id}")
-    public LearningSetDetailsDto one(@PathVariable Long id) throws LearningSetAccessForbiddenException {
+    public LearningSetDetailsDto one(@PathVariable Long id)
+        throws LearningSetAccessForbiddenException, LearningSetNotFoundException {
         return service.findOne(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public LearningSetDetailsDto create(
-            @Valid @RequestBody CreateLearningSetDto createLearningSetDto) {
+    public LearningSetDetailsDto create(@Valid @RequestBody CreateLearningSetDto createLearningSetDto) {
         return service.create(createLearningSetDto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void remove(@PathVariable Long id) {
+    public void remove(@PathVariable Long id)
+        throws LearningSetNotFoundException, LearningSetDeletionAccessForbiddenException {
         service.delete(id);
     }
 
     @PutMapping("/{id}")
-    public LearningSetDetailsDto replace(
-            @Valid @RequestBody CreateLearningSetDto dto,
-            @PathVariable Long id) {
+    public LearningSetDetailsDto replace(@Valid @RequestBody CreateLearningSetDto dto,
+                                         @PathVariable Long id)
+        throws LearningSetAccessForbiddenException, LearningSetNotFoundException {
         return service.replace(dto, id);
     }
 }
