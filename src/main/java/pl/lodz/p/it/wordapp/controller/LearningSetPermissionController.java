@@ -29,7 +29,7 @@ public class LearningSetPermissionController {
     public void addReadPermission(
             @PathVariable Long setId,
             @PathVariable Long userId) {
-        // TODO
+        permissionService.addReadPermission(setId, userId);
     }
 
     @PutMapping("/{userId}/propose")
@@ -51,7 +51,7 @@ public class LearningSetPermissionController {
     public void deleteReadPermission(
             @PathVariable Long setId,
             @PathVariable Long userId) {
-        // TODO
+        permissionService.deleteAddPermission(setId, userId);
     }
 
     @DeleteMapping("/{userId}/propose")
