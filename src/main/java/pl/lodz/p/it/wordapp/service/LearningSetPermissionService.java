@@ -1,7 +1,5 @@
 package pl.lodz.p.it.wordapp.service;
 
-import static pl.lodz.p.it.wordapp.service.UserService.getCurrentUserId;
-
 import javax.transaction.Transactional;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,7 +33,7 @@ public class LearningSetPermissionService {
      * @return Object with user's permissions.
      */
     public PermissionsDto getPermissions(Long setId) {
-        Long userId = getCurrentUserId();
+        Long userId = UserService.getCurrentUserId();
 
         return accessRoleRepository
             .findBySet_IdAndUser_Id(setId, userId)
@@ -50,11 +48,11 @@ public class LearningSetPermissionService {
     }
 
     // region READ permission
-
     @Transactional
     public void addReadPermission(Long setId, Long userId)
         throws PermissionManagementAccessForbiddenException, LearningSetNotFoundException, UserNotFoundException {
-        Long requestAuthorId = getCurrentUserId();
+        Long requestAuthorId = UserService.getCurrentUserId();
+
         if (isOwner(requestAuthorId, setId)) {
             Optional<AccessRole> accessRole = accessRoleRepository
                 .findBySet_IdAndUser_Id(setId, userId);
@@ -75,9 +73,9 @@ public class LearningSetPermissionService {
     }
 
     @Transactional
-    public void deleteAddPermission(Long setId, Long userId)
+    public void deleteReadPermission(Long setId, Long userId)
         throws PermissionManagementAccessForbiddenException, PermissionSelfManagementException {
-        Long requestAuthorId = getCurrentUserId();
+        Long requestAuthorId = UserService.getCurrentUserId();
 
         if (isOwner(requestAuthorId, setId)) {
             if (Objects.equals(requestAuthorId, userId)) {
@@ -92,11 +90,55 @@ public class LearningSetPermissionService {
             throw new PermissionManagementAccessForbiddenException();
         }
     }
+    // endregion
 
+    // region PROPOSE permission
+    @Transactional
+    public void addProposePermission(Long setId, Long userId)
+        throws PermissionManagementAccessForbiddenException, LearningSetNotFoundException, UserNotFoundException {
+        Long requestAuthorId = UserService.getCurrentUserId();
+
+        if (isOwner(requestAuthorId, setId)) {
+            AccessRole accessRole = accessRoleRepository.findBySet_IdAndUser_Id(setId, userId).orElse(null);
+
+            if (accessRole == null) {
+                LearningSet ls = learningSetRepository
+                    .findById(setId)
+                    .orElseThrow(() -> new LearningSetNotFoundException(setId));
+                Account acc = accountRepository
+                    .findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException(userId));
+
+                accessRoleRepository.save(new AccessRole(Role.PROPOSER, ls, acc));
+            } else if (accessRole.getRole() == Role.READER) {
+                accessRole.setRole(Role.PROPOSER);
+                accessRoleRepository.save(accessRole);
+            }
+        } else {
+            throw new PermissionManagementAccessForbiddenException();
+        }
+    }
+
+    @Transactional
+    public void deleteProposePermission(Long setId, Long userId)
+        throws PermissionManagementAccessForbiddenException {
+        Long requestAuthorId = UserService.getCurrentUserId();
+
+        if (isOwner(requestAuthorId, setId)) {
+            AccessRole accessRole = accessRoleRepository.findBySet_IdAndUser_Id(setId, userId).orElse(null);
+
+            if (accessRole != null && accessRole.getRole().compareTo(Role.READER) > 0) {
+                accessRole.setRole(Role.READER);
+                accessRoleRepository.save(accessRole);
+            }
+        } else {
+            throw new PermissionManagementAccessForbiddenException();
+        }
+    }
     // endregion
 
     /**
-     * Method veryfing if given user is owner of particular learning set.
+     * Method verifying if given user is owner of particular learning set.
      *
      * @param userId ID of the user we want to check permissions of.
      * @param setId ID of the learning set.

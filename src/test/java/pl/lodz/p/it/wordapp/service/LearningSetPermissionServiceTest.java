@@ -33,6 +33,7 @@ class LearningSetPermissionServiceTest {
     @Autowired
     private AccessRoleRepository accessRoleRepository;
 
+    // region getPermissions
     @Test
     @WithAnonymousUser
     void getPermissionsAnonymousUserTest() {
@@ -86,7 +87,9 @@ class LearningSetPermissionServiceTest {
         assertFalse(perm.isAbleToEdit());
         assertFalse(perm.isAbleToManage());
     }
+    // endregion
 
+    // region Add Read Permission
     @Test
     @WithUserDetails("user1")
     void addReadPermissionAsOwnerTest() throws UserNotFoundException,
@@ -118,8 +121,7 @@ class LearningSetPermissionServiceTest {
         assertThrows(
             PermissionManagementAccessForbiddenException.class,
             () -> permissionService.addReadPermission(1L, 4L)
-        )
-        ;
+        );
     }
 
     @Test
@@ -139,7 +141,9 @@ class LearningSetPermissionServiceTest {
             () -> permissionService.addReadPermission(1L, 10L)
         );
     }
+    // endregion
 
+    // region Delete Read Permission
     @Test
     @WithUserDetails("user2")
     void deleteReadPermissionAsOwnerTest()
@@ -152,7 +156,7 @@ class LearningSetPermissionServiceTest {
         assertNotNull(accessRole);
         assertEquals(Role.READER, accessRole.getRole());
 
-        permissionService.deleteAddPermission(2L, 1L);
+        permissionService.deleteReadPermission(2L, 1L);
 
         accessRole = accessRoleRepository
             .findBySet_IdAndUser_Id(2L, 1L)
@@ -166,7 +170,7 @@ class LearningSetPermissionServiceTest {
     void deleteReadPermissionNotAsOwnerTest() {
         assertThrows(
             PermissionManagementAccessForbiddenException.class,
-            () -> permissionService.deleteAddPermission(2L, 1L)
+            () -> permissionService.deleteReadPermission(2L, 1L)
         );
     }
 
@@ -175,7 +179,7 @@ class LearningSetPermissionServiceTest {
     void deleteReadPermissionFromSelfTest() {
         assertThrows(
             PermissionSelfManagementException.class,
-            () -> permissionService.deleteAddPermission(2L, 2L)
+            () -> permissionService.deleteReadPermission(2L, 2L)
         );
 
         AccessRole accessRole = accessRoleRepository
@@ -185,4 +189,103 @@ class LearningSetPermissionServiceTest {
         assertNotNull(accessRole);
         assertEquals(Role.OWNER, accessRole.getRole());
     }
+    // endregion
+
+    // region Add Propopose Permission
+    @Test
+    @WithUserDetails("user1")
+    void addProposePermissionAsOwnerTest()
+        throws PermissionManagementAccessForbiddenException, UserNotFoundException, LearningSetNotFoundException {
+        AccessRole accessRole;
+
+        accessRole = accessRoleRepository.findBySet_IdAndUser_Id(1L, 4L).orElse(null);
+        assertNull(accessRole);
+
+        permissionService.addProposePermission(1L, 4L);
+        accessRole = accessRoleRepository.findBySet_IdAndUser_Id(1L, 4L).orElse(null);
+
+        assertNotNull(accessRole);
+        assertEquals(Role.PROPOSER, accessRole.getRole());
+
+        permissionService.addProposePermission(1L, 4L);
+        accessRole = accessRoleRepository.findBySet_IdAndUser_Id(1L, 4L).orElse(null);
+
+        assertNotNull(accessRole);
+        assertEquals(Role.PROPOSER, accessRole.getRole());
+    }
+
+    @Test
+    @WithUserDetails("user1")
+    void addProposePermissionNotAsOwnerTest() {
+        assertThrows(
+            PermissionManagementAccessForbiddenException.class,
+            () -> permissionService.addProposePermission(2L, 3L)
+        );
+    }
+
+    @Test
+    @WithUserDetails("user1")
+    void addProposePermissionShouldNotAlterHigherPermissionTest()
+        throws PermissionManagementAccessForbiddenException, UserNotFoundException, LearningSetNotFoundException {
+        permissionService.addProposePermission(1L, 2L);
+
+        AccessRole accessRole = accessRoleRepository.findBySet_IdAndUser_Id(1L, 2L)
+                                                    .orElse(null);
+
+        assertNotNull(accessRole);
+        assertEquals(Role.EDITOR, accessRole.getRole());
+    }
+    // endregion
+
+    // region Delete Propose Permission
+    @Test
+    @WithUserDetails("user1")
+    void deleteProposePermissionAsOwnerTest()
+        throws PermissionManagementAccessForbiddenException {
+        AccessRole accessRole;
+        accessRole = accessRoleRepository.findBySet_IdAndUser_Id(1L, 3L).orElse(null);
+
+        assertNotNull(accessRole);
+        assertEquals(Role.PROPOSER, accessRole.getRole());
+
+        permissionService.deleteProposePermission(1L, 3L);
+        accessRole = accessRoleRepository.findBySet_IdAndUser_Id(1L, 3L).orElse(null);
+
+        assertNotNull(accessRole);
+        assertEquals(Role.READER, accessRole.getRole());
+
+        permissionService.deleteProposePermission(1L, 3L);
+        accessRole = accessRoleRepository.findBySet_IdAndUser_Id(1L, 3L).orElse(null);
+
+        assertNotNull(accessRole);
+        assertEquals(Role.READER, accessRole.getRole());
+    }
+
+    @Test
+    @WithUserDetails("user1")
+    void deleteProposePermissionsNotAsOwnerTest() {
+        assertThrows(
+            PermissionManagementAccessForbiddenException.class,
+            () -> permissionService.deleteProposePermission(2L, 1L)
+        );
+    }
+
+    @Test
+    @WithUserDetails("user1")
+    void deleteProposePermissionShouldDemoteRoleTest()
+        throws PermissionManagementAccessForbiddenException {
+        AccessRole accessRole;
+        accessRole = accessRoleRepository.findBySet_IdAndUser_Id(1L, 2L).orElse(null);
+
+        assertNotNull(accessRole);
+        assertEquals(Role.EDITOR, accessRole.getRole());
+
+        permissionService.deleteProposePermission(1L, 2L);
+
+        accessRole = accessRoleRepository.findBySet_IdAndUser_Id(1L, 2L).orElse(null);
+
+        assertNotNull(accessRole);
+        assertEquals(Role.READER, accessRole.getRole());
+    }
+    // endregion
 }

@@ -55,4 +55,9 @@ public class AccessRole {
     private void fillTransient() {
         role = Role.of(roleValue);
     }
+
+    public void setRole(Role role) {
+        this.role = role;
+        this.roleValue = role.getValue();
+    }
 }
