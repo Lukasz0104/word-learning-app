@@ -30,6 +30,7 @@ public class LearningSetPermissionController {
     }
 
     @PutMapping("/{userId}/read")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addReadPermission(@PathVariable Long setId,
                                   @PathVariable Long userId)
         throws UserNotFoundException, LearningSetNotFoundException, PermissionManagementAccessForbiddenException {
@@ -37,6 +38,7 @@ public class LearningSetPermissionController {
     }
 
     @PutMapping("/{userId}/propose")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addProposePermission(@PathVariable Long setId,
                                      @PathVariable Long userId)
         throws UserNotFoundException, LearningSetNotFoundException, PermissionManagementAccessForbiddenException {
@@ -44,10 +46,11 @@ public class LearningSetPermissionController {
     }
 
     @PutMapping("/{userId}/edit")
-    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addEditPermission(@PathVariable Long setId,
-                                  @PathVariable Long userId) {
-        // TODO
+                                  @PathVariable Long userId)
+        throws UserNotFoundException, LearningSetNotFoundException, PermissionManagementAccessForbiddenException {
+        permissionService.addEditPermission(setId, userId);
     }
 
     @DeleteMapping("/{userId}/read")
@@ -62,15 +65,15 @@ public class LearningSetPermissionController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProposePermission(@PathVariable Long setId,
                                         @PathVariable Long userId)
-        throws PermissionManagementAccessForbiddenException {
+        throws PermissionManagementAccessForbiddenException, PermissionSelfManagementException {
         permissionService.deleteProposePermission(setId, userId);
     }
 
     @DeleteMapping("/{userId}/edit")
-    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
-    // @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteEditPermission(@PathVariable Long setId,
-                                     @PathVariable Long userId) {
-        // TODO
+                                     @PathVariable Long userId)
+        throws PermissionSelfManagementException, PermissionManagementAccessForbiddenException {
+        permissionService.deleteEditPermission(setId, userId);
     }
 }

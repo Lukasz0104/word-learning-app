@@ -77,11 +77,11 @@ public class LearningSetPermissionService {
         throws PermissionManagementAccessForbiddenException, PermissionSelfManagementException {
         Long requestAuthorId = UserService.getCurrentUserId();
 
-        if (isOwner(requestAuthorId, setId)) {
-            if (Objects.equals(requestAuthorId, userId)) {
-                throw new PermissionSelfManagementException();
-            }
+        if (Objects.equals(requestAuthorId, userId)) {
+            throw new PermissionSelfManagementException();
+        }
 
+        if (isOwner(requestAuthorId, setId)) {
             Optional<AccessRole> accessRole = accessRoleRepository
                 .findBySet_IdAndUser_Id(setId, userId);
 
@@ -121,8 +121,12 @@ public class LearningSetPermissionService {
 
     @Transactional
     public void deleteProposePermission(Long setId, Long userId)
-        throws PermissionManagementAccessForbiddenException {
+        throws PermissionManagementAccessForbiddenException, PermissionSelfManagementException {
         Long requestAuthorId = UserService.getCurrentUserId();
+
+        if (Objects.equals(requestAuthorId, userId)) {
+            throw new PermissionSelfManagementException();
+        }
 
         if (isOwner(requestAuthorId, setId)) {
             AccessRole accessRole = accessRoleRepository.findBySet_IdAndUser_Id(setId, userId).orElse(null);
@@ -130,6 +134,58 @@ public class LearningSetPermissionService {
             if (accessRole != null && accessRole.getRole().compareTo(Role.READER) > 0) {
                 accessRole.setRole(Role.READER);
                 accessRoleRepository.save(accessRole);
+            }
+        } else {
+            throw new PermissionManagementAccessForbiddenException();
+        }
+    }
+    // endregion
+
+    // region EDIT permission
+    @Transactional
+    public void addEditPermission(Long setId, Long userId)
+        throws UserNotFoundException, PermissionManagementAccessForbiddenException, LearningSetNotFoundException {
+        Long requestAuthorId = UserService.getCurrentUserId();
+
+        if (isOwner(requestAuthorId, setId)) {
+            Optional<AccessRole> accessRole = accessRoleRepository.findBySet_IdAndUser_Id(setId, userId);
+
+            if (accessRole.isEmpty()) {
+                LearningSet ls = learningSetRepository
+                    .findById(setId)
+                    .orElseThrow(() -> new LearningSetNotFoundException(setId));
+                Account acc = accountRepository
+                    .findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException(userId));
+                accessRoleRepository.save(new AccessRole(Role.EDITOR, ls, acc));
+            } else if (accessRole.get().getRole().compareTo(Role.EDITOR) < 0) {
+                accessRole.map(ar -> {
+                    ar.setRole(Role.EDITOR);
+                    return accessRoleRepository.save(ar);
+                });
+            }
+        } else {
+            throw new PermissionManagementAccessForbiddenException();
+        }
+    }
+
+    @Transactional
+    public void deleteEditPermission(Long setId, Long userId)
+        throws PermissionManagementAccessForbiddenException, PermissionSelfManagementException {
+        Long requestAuthorId = UserService.getCurrentUserId();
+
+        if (Objects.equals(requestAuthorId, userId)) {
+            throw new PermissionSelfManagementException();
+        }
+
+        if (isOwner(requestAuthorId, setId)) {
+            Optional<AccessRole> accessRole = accessRoleRepository.findBySet_IdAndUser_Id(setId, userId);
+
+            if (accessRole.isPresent() && accessRole.get().getRole() == Role.EDITOR) {
+                accessRole.map(ar -> {
+                    ar.setRole(Role.PROPOSER);
+                    return accessRoleRepository.save(ar);
+                });
             }
         } else {
             throw new PermissionManagementAccessForbiddenException();
