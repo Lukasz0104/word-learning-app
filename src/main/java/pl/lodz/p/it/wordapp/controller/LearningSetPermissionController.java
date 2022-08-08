@@ -1,5 +1,6 @@
 package pl.lodz.p.it.wordapp.controller;
 
+import java.util.List;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.wordapp.controller.dto.PermissionsDto;
+import pl.lodz.p.it.wordapp.controller.dto.UserPermissionsDto;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
+import pl.lodz.p.it.wordapp.exception.LearningSetPermissionAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.PermissionManagementAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.PermissionSelfManagementException;
 import pl.lodz.p.it.wordapp.exception.UserNotFoundException;
@@ -29,7 +32,20 @@ public class LearningSetPermissionController {
         return permissionService.getPermissions(setId);
     }
 
-    @PutMapping("/{userId}/read")
+    @GetMapping("/users/{userId}")
+    public PermissionsDto getPermissionsForUser(@PathVariable Long setId,
+                                                @PathVariable Long userId)
+        throws LearningSetPermissionAccessForbiddenException {
+        return permissionService.getPermissionsForUser(setId, userId);
+    }
+
+    @GetMapping("/users")
+    public List<UserPermissionsDto> getPermissionsForUsers(@PathVariable Long setId)
+        throws LearningSetPermissionAccessForbiddenException {
+        return permissionService.getPermissionsForUsers(setId);
+    }
+
+    @PutMapping("/users/{userId}/read")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addReadPermission(@PathVariable Long setId,
                                   @PathVariable Long userId)
@@ -37,7 +53,7 @@ public class LearningSetPermissionController {
         permissionService.addReadPermission(setId, userId);
     }
 
-    @PutMapping("/{userId}/propose")
+    @PutMapping("/users/{userId}/propose")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addProposePermission(@PathVariable Long setId,
                                      @PathVariable Long userId)
@@ -45,7 +61,7 @@ public class LearningSetPermissionController {
         permissionService.addProposePermission(setId, userId);
     }
 
-    @PutMapping("/{userId}/edit")
+    @PutMapping("/users/{userId}/edit")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addEditPermission(@PathVariable Long setId,
                                   @PathVariable Long userId)
@@ -53,7 +69,7 @@ public class LearningSetPermissionController {
         permissionService.addEditPermission(setId, userId);
     }
 
-    @DeleteMapping("/{userId}/read")
+    @DeleteMapping("/users/{userId}/read")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReadPermission(@PathVariable Long setId,
                                      @PathVariable Long userId)
@@ -61,7 +77,7 @@ public class LearningSetPermissionController {
         permissionService.deleteReadPermission(setId, userId);
     }
 
-    @DeleteMapping("/{userId}/propose")
+    @DeleteMapping("/users/{userId}/propose")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProposePermission(@PathVariable Long setId,
                                         @PathVariable Long userId)
@@ -69,7 +85,7 @@ public class LearningSetPermissionController {
         permissionService.deleteProposePermission(setId, userId);
     }
 
-    @DeleteMapping("/{userId}/edit")
+    @DeleteMapping("/users/{userId}/edit")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteEditPermission(@PathVariable Long setId,
                                      @PathVariable Long userId)

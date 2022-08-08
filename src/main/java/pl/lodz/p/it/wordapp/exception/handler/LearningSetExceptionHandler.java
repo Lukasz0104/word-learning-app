@@ -14,6 +14,7 @@ import pl.lodz.p.it.wordapp.exception.LearningSetAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.LearningSetDeletionAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.LearningSetItemNotFoundException;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
+import pl.lodz.p.it.wordapp.exception.LearningSetPermissionAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.PermissionManagementAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.PermissionSelfManagementException;
 import pl.lodz.p.it.wordapp.exception.UserNotFoundException;
@@ -57,7 +58,8 @@ public class LearningSetExceptionHandler {
     @ExceptionHandler({
         LearningSetAccessForbiddenException.class,
         LearningSetDeletionAccessForbiddenException.class,
-        PermissionManagementAccessForbiddenException.class
+        PermissionManagementAccessForbiddenException.class,
+        LearningSetPermissionAccessForbiddenException.class
     })
     @ResponseBody
     @ResponseStatus(HttpStatus.FORBIDDEN)

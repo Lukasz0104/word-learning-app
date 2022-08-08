@@ -8,13 +8,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import pl.lodz.p.it.wordapp.controller.dto.PermissionsDto;
+import pl.lodz.p.it.wordapp.controller.dto.UserPermissionsDto;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
+import pl.lodz.p.it.wordapp.exception.LearningSetPermissionAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.PermissionManagementAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.PermissionSelfManagementException;
 import pl.lodz.p.it.wordapp.exception.UserNotFoundException;
@@ -86,6 +89,60 @@ class LearningSetPermissionServiceTest {
         assertTrue(perm.isAbleToProposeChanges());
         assertFalse(perm.isAbleToEdit());
         assertFalse(perm.isAbleToManage());
+    }
+    // endregion
+
+    // region getPermissionForUser
+    @Test
+    @WithUserDetails("user1")
+    void getPermissionForUserAsOwnerTest() throws LearningSetPermissionAccessForbiddenException {
+        perm = permissionService.getPermissionsForUser(1L, 2L);
+        assertTrue(perm.isAbleToEdit());
+        assertFalse(perm.isAbleToManage());
+
+        perm = permissionService.getPermissionsForUser(1L, 3L);
+        assertTrue(perm.isAbleToProposeChanges());
+        assertFalse(perm.isAbleToEdit());
+    }
+
+    @Test
+    @WithUserDetails("user2")
+    void getPermissionForUserNotAsOwnerTest() {
+        assertThrows(
+            LearningSetPermissionAccessForbiddenException.class,
+            () -> permissionService.getPermissionsForUser(1L, 2L)
+        );
+    }
+    // endregion
+
+    // region getPermissionsForUsers
+    @Test
+    @WithUserDetails("user3")
+    void getPermissionForUsersAsOwnerTest() throws LearningSetPermissionAccessForbiddenException {
+        List<UserPermissionsDto> retrievedPermissions = permissionService.getPermissionsForUsers(3L);
+
+        assertNotNull(retrievedPermissions);
+        assertEquals(2, retrievedPermissions.size());
+
+        assertEquals(1L, retrievedPermissions.get(0).getUserId());
+        assertEquals("user1", retrievedPermissions.get(0).getUsername());
+        assertTrue(retrievedPermissions.get(0).isAbleToRead());
+        assertFalse(retrievedPermissions.get(0).isAbleToProposeChanges());
+
+
+        assertEquals(4L, retrievedPermissions.get(1).getUserId());
+        assertEquals("user4", retrievedPermissions.get(1).getUsername());
+        assertTrue(retrievedPermissions.get(1).isAbleToProposeChanges());
+        assertFalse(retrievedPermissions.get(1).isAbleToEdit());
+    }
+
+    @Test
+    @WithUserDetails("user2")
+    void getPermissionsForUsersNotAsOwnerTest() {
+        assertThrows(
+            LearningSetPermissionAccessForbiddenException.class,
+            () -> permissionService.getPermissionsForUsers(1L)
+        );
     }
     // endregion
 

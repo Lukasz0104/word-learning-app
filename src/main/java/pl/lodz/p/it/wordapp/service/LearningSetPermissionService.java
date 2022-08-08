@@ -1,13 +1,16 @@
 package pl.lodz.p.it.wordapp.service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.lodz.p.it.wordapp.controller.dto.LearningSetDetailsDto;
 import pl.lodz.p.it.wordapp.controller.dto.PermissionsDto;
+import pl.lodz.p.it.wordapp.controller.dto.UserPermissionsDto;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
+import pl.lodz.p.it.wordapp.exception.LearningSetPermissionAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.PermissionManagementAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.PermissionSelfManagementException;
 import pl.lodz.p.it.wordapp.exception.UserNotFoundException;
@@ -45,6 +48,37 @@ public class LearningSetPermissionService {
                     .map(dto -> new PermissionsDto(Role.READER))
                     .orElseGet(PermissionsDto::new)
             );
+    }
+
+    public PermissionsDto getPermissionsForUser(Long setId, Long userId)
+        throws LearningSetPermissionAccessForbiddenException {
+        if (!isOwner(UserService.getCurrentUserId(), setId)) {
+            throw new LearningSetPermissionAccessForbiddenException();
+        }
+
+        return accessRoleRepository
+            .findBySet_IdAndUser_Id(setId, userId)
+            .map(PermissionsDto::new)
+            .orElseGet(() -> learningSetRepository
+                .findDistinctById(setId)
+                .filter(LearningSetDetailsDto::isPubliclyVisible)
+                .map(dto -> new PermissionsDto(Role.READER))
+                .orElseGet(PermissionsDto::new)
+            );
+    }
+
+    public List<UserPermissionsDto> getPermissionsForUsers(Long setId)
+        throws LearningSetPermissionAccessForbiddenException {
+        if (!isOwner(UserService.getCurrentUserId(), setId)) {
+            throw new LearningSetPermissionAccessForbiddenException();
+        }
+
+        return accessRoleRepository
+            .findBySet_IdOrderById(setId)
+            .stream()
+            .filter(ar -> ar.getRole() != Role.OWNER)
+            .map(UserPermissionsDto::new)
+            .toList();
     }
 
     // region READ permission
