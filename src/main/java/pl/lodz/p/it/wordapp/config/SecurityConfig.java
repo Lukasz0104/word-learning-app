@@ -21,10 +21,10 @@ import pl.lodz.p.it.wordapp.service.UserService;
 @Configuration
 @RequiredArgsConstructor
 @SecurityScheme(
-        name = "bearerAuth",
-        type = SecuritySchemeType.HTTP,
-        bearerFormat = "JWT",
-        scheme = "bearer"
+    name = "bearerAuth",
+    type = SecuritySchemeType.HTTP,
+    bearerFormat = "JWT",
+    scheme = "bearer"
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -37,6 +37,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Value("${jwt.expirationTime}")
+    private long expirationTime;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -45,29 +48,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
+            .userDetailsService(userDetailsService)
+            .passwordEncoder(passwordEncoder());
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http
-                .authorizeRequests()
-                .antMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                .antMatchers("/h2-console/**").permitAll()
-                .antMatchers("/register").permitAll()
-                .antMatchers(HttpMethod.GET).permitAll()
-                .anyRequest().hasRole("USER")
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .addFilter(authenticationFilter())
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), userDetailsService, secret))
-                .exceptionHandling()
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                .and()
-                .headers().frameOptions().disable();
+            .authorizeRequests()
+            .antMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+            .antMatchers("/h2-console/**").permitAll()
+            .antMatchers("/register").permitAll()
+            .antMatchers(HttpMethod.GET).permitAll()
+            .anyRequest().hasRole("USER")
+            .and()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .addFilter(authenticationFilter())
+            .addFilter(new JwtAuthorizationFilter(authenticationManager(), userDetailsService, secret, expirationTime))
+            .exceptionHandling()
+            .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+            .and()
+            .headers().frameOptions().disable();
     }
 
     public JsonObjectAuthenticationFilter authenticationFilter() throws Exception {

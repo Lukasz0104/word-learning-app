@@ -17,9 +17,8 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
     private final long expirationTime;
     private final String secret;
 
-    public RestAuthenticationSuccessHandler(
-            @Value("${jwt.expirationTime}") long expirationTime,
-            @Value("${jwt.secret}") String secret) {
+    public RestAuthenticationSuccessHandler(@Value("${jwt.expirationTime}") long expirationTime,
+                                            @Value("${jwt.secret}") String secret) {
         this.expirationTime = expirationTime;
         this.secret = secret;
     }
@@ -30,9 +29,9 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
                                         Authentication authentication) {
         UserDetails principal = (UserDetails) authentication.getPrincipal();
         String token = JWT.create()
-                .withSubject(principal.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
-                .sign(Algorithm.HMAC256(secret));
+                          .withSubject(principal.getUsername())
+                          .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
+                          .sign(Algorithm.HMAC256(secret));
         response.addHeader("Authorization", "Bearer " + token);
     }
 }

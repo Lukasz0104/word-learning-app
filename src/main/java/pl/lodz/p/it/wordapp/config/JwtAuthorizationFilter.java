@@ -5,6 +5,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Date;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import pl.lodz.p.it.wordapp.model.Account;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private static final String TOKEN_HEADER = "Authorization";
@@ -20,20 +22,23 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private final UserDetailsService userDetailsService;
     private final String secret;
+    private final long expirationTime;
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager,
                                   UserDetailsService userDetailsService,
-                                  String secret) {
+                                  String secret,
+                                  long expirationTime) {
         super(authenticationManager);
         this.userDetailsService = userDetailsService;
         this.secret = secret;
+        this.expirationTime = expirationTime;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
-            throws IOException, ServletException {
+        throws IOException, ServletException {
 
         UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
         if (authentication == null) {
@@ -41,6 +46,13 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             return;
         }
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String token = JWT.create()
+                          .withSubject(((Account) (authentication.getPrincipal())).getUsername())
+                          .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
+                          .sign(Algorithm.HMAC256(secret));
+        response.addHeader("Authorization", "Bearer " + token);
+
         filterChain.doFilter(request, response);
     }
 
@@ -48,9 +60,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String token = request.getHeader(TOKEN_HEADER);
         if (token != null && token.startsWith(TOKEN_PREFIX)) {
             String userName = JWT.require(Algorithm.HMAC256(secret))
-                    .build()
-                    .verify(token.replace(TOKEN_PREFIX, ""))
-                    .getSubject();
+                                 .build()
+                                 .verify(token.replace(TOKEN_PREFIX, ""))
+                                 .getSubject();
             if (userName != null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
                 return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
