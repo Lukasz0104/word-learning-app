@@ -35,9 +35,12 @@ public class LearningSetController {
     public List<LearningSetDetailsDto> all(
         @RequestParam(name = "termLanguages", required = false) Collection<String> termLanguages,
         @RequestParam(name = "translationLanguages", required = false) Collection<String> translationLanguages,
-        @RequestParam(name = "titlePattern", required = false) String titlePattern) {
+        @RequestParam(name = "titlePattern", required = false) String titlePattern,
+        @RequestParam(required = false) Integer page) {
 
-        return service.findAll(termLanguages, translationLanguages, titlePattern);
+        int pageNo = page != null && page >= 0 ? page : 0;
+
+        return service.findAll(termLanguages, translationLanguages, titlePattern, pageNo);
     }
 
     @GetMapping("/{id}")

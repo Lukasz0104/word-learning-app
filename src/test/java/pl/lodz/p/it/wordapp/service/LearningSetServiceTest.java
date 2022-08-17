@@ -94,21 +94,21 @@ class LearningSetServiceTest {
     @Test
     @WithAnonymousUser
     void findAllAnonymousUserNoParamsTest() {
-        List<LearningSetDetailsDto> learningSets = service.findAll(null, null, null);
+        List<LearningSetDetailsDto> learningSets = service.findAll(null, null, null, 0);
         assertEquals(1, learningSets.size());
     }
 
     @Test
     @WithUserDetails("user1")
     void findAllUser1NoParamsTest() {
-        List<LearningSetDetailsDto> sets = service.findAll(null, null, null);
+        List<LearningSetDetailsDto> sets = service.findAll(null, null, null, 0);
         assertEquals(3, sets.size());
     }
 
     @Test
     @WithUserDetails("user2")
     void findAllUser2NoParamsTest() {
-        List<LearningSetDetailsDto> sets = service.findAll(null, null, null);
+        List<LearningSetDetailsDto> sets = service.findAll(null, null, null,0);
         assertEquals(2, sets.size());
     }
 
@@ -116,7 +116,7 @@ class LearningSetServiceTest {
     @WithUserDetails("user1")
     void findAllUser1WithTermLanguagesParamTest() {
         List<String> termLanguages = List.of("de");
-        List<LearningSetDetailsDto> sets = service.findAll(termLanguages, null, null);
+        List<LearningSetDetailsDto> sets = service.findAll(termLanguages, null, null,0);
 
         assertEquals(2, sets.size());
         for (LearningSetDetailsDto set : sets) {
@@ -128,7 +128,7 @@ class LearningSetServiceTest {
     @WithUserDetails("user3")
     void findAllUser3WithTranslationLanguageTest() {
         List<String> translationLanguages = List.of("en");
-        List<LearningSetDetailsDto> sets = service.findAll(null, translationLanguages, null);
+        List<LearningSetDetailsDto> sets = service.findAll(null, translationLanguages, null,0);
 
         assertEquals(1, sets.size());
         for (LearningSetDetailsDto set : sets) {
@@ -139,7 +139,7 @@ class LearningSetServiceTest {
     @Test
     @WithUserDetails("user4")
     void findAllUser4TitlePatternParamTest() {
-        List<LearningSetDetailsDto> sets = service.findAll(null, null, "ni");
+        List<LearningSetDetailsDto> sets = service.findAll(null, null, "ni",0);
         assertEquals(2, sets.size());
     }
 

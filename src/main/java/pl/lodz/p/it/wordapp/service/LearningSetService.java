@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pl.lodz.p.it.wordapp.controller.dto.CreateLearningSetDto;
@@ -29,7 +30,8 @@ public class LearningSetService {
     public List<LearningSetDetailsDto> findAll(
         Collection<String> termLanguages,
         Collection<String> translationLanguages,
-        String titlePattern) {
+        String titlePattern,
+        int page) {
 
         Long userId = UserService.getCurrentUserId();
 
@@ -57,7 +59,8 @@ public class LearningSetService {
             }
         }
 
-        return learningSetRepository.find(userId, termLanguages, translationLanguages, titlePattern);
+        return learningSetRepository
+            .find(userId, termLanguages, translationLanguages, titlePattern, PageRequest.of(page, 24));
     }
 
     public LearningSetDetailsDto findOne(Long id)
