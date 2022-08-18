@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import pl.lodz.p.it.wordapp.exception.BaseApplicationException;
 import pl.lodz.p.it.wordapp.exception.LearningSetAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.LearningSetDeletionAccessForbiddenException;
+import pl.lodz.p.it.wordapp.exception.LearningSetItemModificationAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.LearningSetItemNotFoundException;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
 import pl.lodz.p.it.wordapp.exception.LearningSetPermissionAccessForbiddenException;
@@ -59,7 +60,8 @@ public class LearningSetExceptionHandler {
         LearningSetAccessForbiddenException.class,
         LearningSetDeletionAccessForbiddenException.class,
         PermissionManagementAccessForbiddenException.class,
-        LearningSetPermissionAccessForbiddenException.class
+        LearningSetPermissionAccessForbiddenException.class,
+        LearningSetItemModificationAccessForbiddenException.class
     })
     @ResponseBody
     @ResponseStatus(HttpStatus.FORBIDDEN)

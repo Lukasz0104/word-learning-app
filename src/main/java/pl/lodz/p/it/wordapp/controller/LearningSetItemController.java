@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.wordapp.controller.dto.CreateLearningSetItemDto;
 import pl.lodz.p.it.wordapp.controller.dto.LearningSetItemDto;
+import pl.lodz.p.it.wordapp.exception.LearningSetAccessForbiddenException;
+import pl.lodz.p.it.wordapp.exception.LearningSetItemModificationAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.LearningSetItemNotFoundException;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
 import pl.lodz.p.it.wordapp.service.LearningSetItemService;
@@ -30,14 +32,14 @@ public class LearningSetItemController {
 
     @GetMapping
     public List<LearningSetItemDto> all(@PathVariable Long setID)
-        throws LearningSetNotFoundException {
+        throws LearningSetNotFoundException, LearningSetAccessForbiddenException {
         return itemService.findAll(setID);
     }
 
     @GetMapping("/{itemID}")
     public LearningSetItemDto one(@PathVariable Long setID,
                                   @PathVariable Long itemID)
-        throws LearningSetNotFoundException, LearningSetItemNotFoundException {
+        throws LearningSetNotFoundException, LearningSetItemNotFoundException, LearningSetAccessForbiddenException {
         return itemService.findOne(setID, itemID);
     }
 
@@ -45,7 +47,7 @@ public class LearningSetItemController {
     @ResponseStatus(HttpStatus.CREATED)
     public LearningSetItemDto create(@Valid @RequestBody CreateLearningSetItemDto dto,
                                      @PathVariable Long setID)
-        throws LearningSetNotFoundException {
+        throws LearningSetNotFoundException, LearningSetItemModificationAccessForbiddenException {
         return itemService.create(dto, setID);
     }
 
@@ -53,7 +55,8 @@ public class LearningSetItemController {
     public LearningSetItemDto replace(@Valid @RequestBody CreateLearningSetItemDto dto,
                                       @PathVariable Long setID,
                                       @PathVariable Long itemID)
-        throws LearningSetNotFoundException, LearningSetItemNotFoundException {
+        throws LearningSetNotFoundException, LearningSetItemNotFoundException,
+               LearningSetItemModificationAccessForbiddenException {
         return itemService.replace(dto, setID, itemID);
     }
 
@@ -61,7 +64,8 @@ public class LearningSetItemController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remove(@PathVariable Long setID,
                        @PathVariable Long itemID)
-        throws LearningSetItemNotFoundException, LearningSetNotFoundException {
+        throws LearningSetItemNotFoundException, LearningSetNotFoundException,
+               LearningSetItemModificationAccessForbiddenException {
         itemService.delete(setID, itemID);
     }
 }

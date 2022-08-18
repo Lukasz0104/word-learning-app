@@ -4,7 +4,10 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.lodz.p.it.wordapp.controller.dto.CreateLearningSetItemDto;
+import pl.lodz.p.it.wordapp.controller.dto.LearningSetDetailsDto;
 import pl.lodz.p.it.wordapp.controller.dto.LearningSetItemDto;
+import pl.lodz.p.it.wordapp.exception.LearningSetAccessForbiddenException;
+import pl.lodz.p.it.wordapp.exception.LearningSetItemModificationAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.LearningSetItemNotFoundException;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
 import pl.lodz.p.it.wordapp.model.LearningSet;
@@ -20,32 +23,41 @@ public class LearningSetItemService {
     private final LearningSetRepository setRepository;
     private final LearningSetPermissionService permissionService;
 
-    public List<LearningSetItemDto> findAll(Long setId) throws LearningSetNotFoundException {
-        // TODO check role
-        if (!setRepository.existsById(setId)) {
-            throw new LearningSetNotFoundException(setId);
+    public List<LearningSetItemDto> findAll(Long setId)
+        throws LearningSetNotFoundException, LearningSetAccessForbiddenException {
+        LearningSetDetailsDto set = setRepository.findDistinctById(setId)
+                                                 .orElseThrow(() -> new LearningSetNotFoundException(setId));
+
+        if (!set.isPubliclyVisible() && !permissionService.getPermissions(setId).isAbleToRead()) {
+            throw new LearningSetAccessForbiddenException(setId);
         }
 
         return itemRepository.findByLearningSetItemKey_SetID(setId);
     }
 
     public LearningSetItemDto findOne(Long setId, Long itemId)
-        throws LearningSetNotFoundException, LearningSetItemNotFoundException {
-        // TODO check role
-        if (!setRepository.existsById(setId)) {
-            throw new LearningSetNotFoundException(setId);
+        throws LearningSetNotFoundException, LearningSetItemNotFoundException, LearningSetAccessForbiddenException {
+
+        LearningSetDetailsDto set = setRepository.findDistinctById(setId)
+                                                 .orElseThrow(() -> new LearningSetNotFoundException(setId));
+
+        if (!set.isPubliclyVisible() && !permissionService.getPermissions(setId).isAbleToRead()) {
+            throw new LearningSetAccessForbiddenException(setId);
         }
 
-        LearningSetItem item = itemRepository
+        return itemRepository
             .findById(new LearningSetItemKey(setId, itemId))
+            .map(LearningSetItemDto::new)
             .orElseThrow(() -> new LearningSetItemNotFoundException(setId, itemId));
-
-        return new LearningSetItemDto(item);
     }
 
     public LearningSetItemDto create(CreateLearningSetItemDto dto, Long setId)
-        throws LearningSetNotFoundException {
-        // TODO check role
+        throws LearningSetNotFoundException, LearningSetItemModificationAccessForbiddenException {
+
+        if (!permissionService.getPermissions(setId).isAbleToEdit()) {
+            throw new LearningSetItemModificationAccessForbiddenException(setId);
+        }
+
         LearningSet ls = setRepository
             .findById(setId)
             .orElseThrow(() -> new LearningSetNotFoundException(setId));
@@ -55,13 +67,17 @@ public class LearningSetItemService {
         LearningSetItem lsi = CreateLearningSetItemDto.mapToLearningSetItem(dto, setId, itemID);
         lsi.setSet(ls);
 
-        LearningSetItem created = itemRepository.save(lsi);
-        return new LearningSetItemDto(created);
+        return new LearningSetItemDto(itemRepository.save(lsi));
     }
 
     public LearningSetItemDto replace(CreateLearningSetItemDto dto, Long setId, Long itemId)
-        throws LearningSetNotFoundException, LearningSetItemNotFoundException {
-        // TODO check role
+        throws LearningSetNotFoundException, LearningSetItemNotFoundException,
+               LearningSetItemModificationAccessForbiddenException {
+
+        if (!permissionService.getPermissions(setId).isAbleToEdit()) {
+            throw new LearningSetItemModificationAccessForbiddenException(setId);
+        }
+
         if (!setRepository.existsById(setId)) {
             throw new LearningSetNotFoundException(setId);
         }
@@ -80,8 +96,13 @@ public class LearningSetItemService {
     }
 
     public void delete(Long setId, Long itemId)
-        // TODO check role
-        throws LearningSetItemNotFoundException, LearningSetNotFoundException {
+        throws LearningSetItemNotFoundException, LearningSetNotFoundException,
+               LearningSetItemModificationAccessForbiddenException {
+
+        if (!permissionService.getPermissions(setId).isAbleToEdit()) {
+            throw new LearningSetItemModificationAccessForbiddenException(setId);
+        }
+
         if (!setRepository.existsById(setId)) {
             throw new LearningSetNotFoundException(setId);
         }
