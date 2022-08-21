@@ -7,7 +7,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -60,7 +59,7 @@ public class LearningSet {
     private String termLanguage;
 
     @Column(name = "TRANSLATION_LANGUAGE")
-    @NotBlank(message = "Translation langugae cannot be empty")
+    @NotBlank(message = "Translation language cannot be empty")
     @Pattern(regexp = "^\s*[a-z]{2}\s*$", message = "Translation language must be a 2 letter language code")
     private String translationLanguage;
 
