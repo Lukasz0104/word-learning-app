@@ -10,23 +10,24 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lodz.p.it.wordapp.controller.dto.LoginCredentials;
 import pl.lodz.p.it.wordapp.controller.dto.RegistrationDto;
-import pl.lodz.p.it.wordapp.repository.AccountRepository;
+import pl.lodz.p.it.wordapp.exception.EmailAddressAlreadyTakenException;
+import pl.lodz.p.it.wordapp.exception.UserAlreadyExistsException;
+import pl.lodz.p.it.wordapp.service.UserService;
 
 @RestController
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-    private final AccountRepository accountRepository;
-    private final PasswordEncoder encoder;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public void login(@Valid @RequestBody LoginCredentials credentials) {
-    }
+    public void login(@Valid @RequestBody LoginCredentials credentials) { }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void register(@Valid @RequestBody RegistrationDto registrationDto) {
-        accountRepository.save(registrationDto.mapToAccount(encoder));
+    public void register(@Valid @RequestBody RegistrationDto registrationDto)
+        throws UserAlreadyExistsException, EmailAddressAlreadyTakenException {
+        userService.registerUser(registrationDto, passwordEncoder);
     }
-
 }

@@ -5,7 +5,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.lodz.p.it.wordapp.controller.dto.RegistrationDto;
+import pl.lodz.p.it.wordapp.exception.EmailAddressAlreadyTakenException;
+import pl.lodz.p.it.wordapp.exception.UserAlreadyExistsException;
 import pl.lodz.p.it.wordapp.model.Account;
 import pl.lodz.p.it.wordapp.repository.AccountRepository;
 
@@ -18,8 +22,19 @@ public class UserService implements UserDetailsService {
     @Override
     public Account loadUserByUsername(String username) throws UsernameNotFoundException {
         return repository
-                .findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
+            .findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException(username));
+    }
+
+    public void registerUser(RegistrationDto registrationDto, PasswordEncoder passwordEncoder)
+        throws UserAlreadyExistsException, EmailAddressAlreadyTakenException {
+        if (repository.existsByUsername(registrationDto.getUsername())) {
+            throw new UserAlreadyExistsException();
+        } else if (repository.existsByEmailAddress(registrationDto.getEmailAddress())) {
+            throw new EmailAddressAlreadyTakenException();
+        } else {
+            repository.save(registrationDto.mapToAccount(passwordEncoder));
+        }
     }
 
     /**
