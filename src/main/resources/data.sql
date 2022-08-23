@@ -16,7 +16,7 @@ VALUES ('niemieckie słówka', NOW(), TRUE, 'de', 'pl'),
 
 INSERT INTO LEARNING_SET_ITEM (SET_ID, ITEM_ID, TERM, TRANSLATION)
 VALUES (1, 1, 'hallo', 'cześć'),
-       (1, 2, 'r Hund', 'dog'),
+       (1, 2, 'r Hund', 'pies'),
        (1, 3, 'ja', 'tak'),
        (1, 4, 'nein', 'nie'),
        (2, 1, 'e Katze', 'cat'),
