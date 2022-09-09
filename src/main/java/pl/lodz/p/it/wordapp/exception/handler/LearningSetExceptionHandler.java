@@ -11,12 +11,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import pl.lodz.p.it.wordapp.exception.BaseApplicationException;
 import pl.lodz.p.it.wordapp.exception.EmailAddressAlreadyTakenException;
+import pl.lodz.p.it.wordapp.exception.EmailAddressNotDifferentException;
+import pl.lodz.p.it.wordapp.exception.IncorrectEmailAddressException;
+import pl.lodz.p.it.wordapp.exception.IncorrectPasswordException;
 import pl.lodz.p.it.wordapp.exception.LearningSetAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.LearningSetDeletionAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.LearningSetItemModificationAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.LearningSetItemNotFoundException;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
 import pl.lodz.p.it.wordapp.exception.LearningSetPermissionAccessForbiddenException;
+import pl.lodz.p.it.wordapp.exception.NewPasswordNotDifferentException;
 import pl.lodz.p.it.wordapp.exception.PermissionManagementAccessForbiddenException;
 import pl.lodz.p.it.wordapp.exception.PermissionSelfManagementException;
 import pl.lodz.p.it.wordapp.exception.UserAlreadyExistsException;
@@ -51,10 +55,16 @@ public class LearningSetExceptionHandler {
         return errors;
     }
 
-    @ExceptionHandler(PermissionSelfManagementException.class)
+    @ExceptionHandler({
+        PermissionSelfManagementException.class,
+        IncorrectPasswordException.class,
+        NewPasswordNotDifferentException.class,
+        IncorrectEmailAddressException.class,
+        EmailAddressNotDifferentException.class
+    })
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String permissionSelfManagementExceptionHandler(PermissionSelfManagementException ex) {
+    public String permissionSelfManagementExceptionHandler(BaseApplicationException ex) {
         return ex.getMessage();
     }
 

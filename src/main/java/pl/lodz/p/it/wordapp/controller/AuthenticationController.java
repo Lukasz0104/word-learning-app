@@ -12,13 +12,13 @@ import pl.lodz.p.it.wordapp.controller.dto.LoginCredentials;
 import pl.lodz.p.it.wordapp.controller.dto.RegistrationDto;
 import pl.lodz.p.it.wordapp.exception.EmailAddressAlreadyTakenException;
 import pl.lodz.p.it.wordapp.exception.UserAlreadyExistsException;
-import pl.lodz.p.it.wordapp.service.UserService;
+import pl.lodz.p.it.wordapp.service.AccountService;
 
 @RestController
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-    private final UserService userService;
+    private final AccountService accountService;
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
@@ -28,6 +28,6 @@ public class AuthenticationController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void register(@Valid @RequestBody RegistrationDto registrationDto)
         throws UserAlreadyExistsException, EmailAddressAlreadyTakenException {
-        userService.registerUser(registrationDto, passwordEncoder);
+        accountService.registerUser(registrationDto, passwordEncoder);
     }
 }

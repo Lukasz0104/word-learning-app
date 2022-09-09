@@ -36,7 +36,7 @@ public class LearningSetPermissionService {
      * @return Object with user's permissions.
      */
     public PermissionsDto getPermissions(Long setId) {
-        Long userId = UserService.getCurrentUserId();
+        Long userId = AccountService.getCurrentUserId();
 
         return accessRoleRepository
             .findBySet_IdAndUser_Id(setId, userId)
@@ -52,7 +52,7 @@ public class LearningSetPermissionService {
 
     public PermissionsDto getPermissionsForUser(Long setId, Long userId)
         throws LearningSetPermissionAccessForbiddenException {
-        if (!isOwner(UserService.getCurrentUserId(), setId)) {
+        if (!isOwner(AccountService.getCurrentUserId(), setId)) {
             throw new LearningSetPermissionAccessForbiddenException();
         }
 
@@ -69,7 +69,7 @@ public class LearningSetPermissionService {
 
     public List<UserPermissionsDto> getPermissionsForUsers(Long setId)
         throws LearningSetPermissionAccessForbiddenException {
-        if (!isOwner(UserService.getCurrentUserId(), setId)) {
+        if (!isOwner(AccountService.getCurrentUserId(), setId)) {
             throw new LearningSetPermissionAccessForbiddenException();
         }
 
@@ -85,7 +85,7 @@ public class LearningSetPermissionService {
     @Transactional
     public void addReadPermission(Long setId, Long userId)
         throws PermissionManagementAccessForbiddenException, LearningSetNotFoundException, UserNotFoundException {
-        Long requestAuthorId = UserService.getCurrentUserId();
+        Long requestAuthorId = AccountService.getCurrentUserId();
 
         if (isOwner(requestAuthorId, setId)) {
             Optional<AccessRole> accessRole = accessRoleRepository
@@ -109,7 +109,7 @@ public class LearningSetPermissionService {
     @Transactional
     public void deleteReadPermission(Long setId, Long userId)
         throws PermissionManagementAccessForbiddenException, PermissionSelfManagementException {
-        Long requestAuthorId = UserService.getCurrentUserId();
+        Long requestAuthorId = AccountService.getCurrentUserId();
 
         if (Objects.equals(requestAuthorId, userId)) {
             throw new PermissionSelfManagementException();
@@ -130,7 +130,7 @@ public class LearningSetPermissionService {
     @Transactional
     public void addProposePermission(Long setId, Long userId)
         throws PermissionManagementAccessForbiddenException, LearningSetNotFoundException, UserNotFoundException {
-        Long requestAuthorId = UserService.getCurrentUserId();
+        Long requestAuthorId = AccountService.getCurrentUserId();
 
         if (isOwner(requestAuthorId, setId)) {
             AccessRole accessRole = accessRoleRepository.findBySet_IdAndUser_Id(setId, userId).orElse(null);
@@ -156,7 +156,7 @@ public class LearningSetPermissionService {
     @Transactional
     public void deleteProposePermission(Long setId, Long userId)
         throws PermissionManagementAccessForbiddenException, PermissionSelfManagementException {
-        Long requestAuthorId = UserService.getCurrentUserId();
+        Long requestAuthorId = AccountService.getCurrentUserId();
 
         if (Objects.equals(requestAuthorId, userId)) {
             throw new PermissionSelfManagementException();
@@ -179,7 +179,7 @@ public class LearningSetPermissionService {
     @Transactional
     public void addEditPermission(Long setId, Long userId)
         throws UserNotFoundException, PermissionManagementAccessForbiddenException, LearningSetNotFoundException {
-        Long requestAuthorId = UserService.getCurrentUserId();
+        Long requestAuthorId = AccountService.getCurrentUserId();
 
         if (isOwner(requestAuthorId, setId)) {
             Optional<AccessRole> accessRole = accessRoleRepository.findBySet_IdAndUser_Id(setId, userId);
@@ -206,7 +206,7 @@ public class LearningSetPermissionService {
     @Transactional
     public void deleteEditPermission(Long setId, Long userId)
         throws PermissionManagementAccessForbiddenException, PermissionSelfManagementException {
-        Long requestAuthorId = UserService.getCurrentUserId();
+        Long requestAuthorId = AccountService.getCurrentUserId();
 
         if (Objects.equals(requestAuthorId, userId)) {
             throw new PermissionSelfManagementException();

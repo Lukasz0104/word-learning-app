@@ -16,7 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import pl.lodz.p.it.wordapp.service.UserService;
+import pl.lodz.p.it.wordapp.service.AccountService;
 
 @Configuration
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final RestAuthenticationSuccessHandler successHandler;
     private final RestAuthenticationFailureHandler failureHandler;
 
-    private final UserService userDetailsService;
+    private final AccountService userDetailsService;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -56,6 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/swagger-ui/**").permitAll()
             .antMatchers("/h2-console/**").permitAll()
             .antMatchers("/register").permitAll()
+            .antMatchers(HttpMethod.GET, "/users").authenticated()
             .antMatchers(HttpMethod.GET).permitAll()
             .anyRequest().hasRole("USER")
             .and()

@@ -33,7 +33,7 @@ public class LearningSetService {
         String titlePattern,
         int page) {
 
-        Long userId = UserService.getCurrentUserId();
+        Long userId = AccountService.getCurrentUserId();
 
         if (termLanguages != null) {
             termLanguages = termLanguages
@@ -65,7 +65,7 @@ public class LearningSetService {
 
     public LearningSetDetailsDto findOne(Long id)
         throws LearningSetAccessForbiddenException, LearningSetNotFoundException {
-        Long userId = UserService.getCurrentUserId();
+        Long userId = AccountService.getCurrentUserId();
         Optional<AccessRole> role = accessRoleRepository.findBySet_IdAndUser_Id(id, userId);
 
         LearningSetDetailsDto ls = learningSetRepository
@@ -129,7 +129,7 @@ public class LearningSetService {
     }
 
     private Optional<Role> getUserRoleForSet(Long setId) {
-        Long userId = UserService.getCurrentUserId();
+        Long userId = AccountService.getCurrentUserId();
         return accessRoleRepository
             .findBySet_IdAndUser_Id(setId, userId)
             .map(AccessRole::getRole);

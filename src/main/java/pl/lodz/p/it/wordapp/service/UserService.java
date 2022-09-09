@@ -1,54 +1,75 @@
 package pl.lodz.p.it.wordapp.service;
 
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.lodz.p.it.wordapp.controller.dto.RegistrationDto;
+import pl.lodz.p.it.wordapp.controller.dto.ChangeEmailAddressDto;
+import pl.lodz.p.it.wordapp.controller.dto.ChangePasswordDto;
+import pl.lodz.p.it.wordapp.controller.dto.UserDto;
 import pl.lodz.p.it.wordapp.exception.EmailAddressAlreadyTakenException;
-import pl.lodz.p.it.wordapp.exception.UserAlreadyExistsException;
+import pl.lodz.p.it.wordapp.exception.EmailAddressNotDifferentException;
+import pl.lodz.p.it.wordapp.exception.IncorrectEmailAddressException;
+import pl.lodz.p.it.wordapp.exception.IncorrectPasswordException;
+import pl.lodz.p.it.wordapp.exception.NewPasswordNotDifferentException;
 import pl.lodz.p.it.wordapp.model.Account;
 import pl.lodz.p.it.wordapp.repository.AccountRepository;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService {
 
-    private final AccountRepository repository;
+    private final AccountRepository accountRepository;
+    private final PasswordEncoder encoder;
 
-    @Override
-    public Account loadUserByUsername(String username) throws UsernameNotFoundException {
-        return repository
-            .findByUsername(username)
-            .orElseThrow(() -> new UsernameNotFoundException(username));
+    public List<UserDto> findAll(String name, Pageable page) {
+        final Long currentUserId = AccountService.getCurrentUserId();
+        return accountRepository.findByIdNotAndUsernameStartsWithIgnoreCase(currentUserId, name, page);
     }
 
-    public void registerUser(RegistrationDto registrationDto, PasswordEncoder passwordEncoder)
-        throws UserAlreadyExistsException, EmailAddressAlreadyTakenException {
-        if (repository.existsByUsername(registrationDto.getUsername())) {
-            throw new UserAlreadyExistsException();
-        } else if (repository.existsByEmailAddress(registrationDto.getEmailAddress())) {
-            throw new EmailAddressAlreadyTakenException();
-        } else {
-            repository.save(registrationDto.mapToAccount(passwordEncoder));
+    public void changePassword(ChangePasswordDto passwordDto)
+        throws IncorrectPasswordException, NewPasswordNotDifferentException {
+        Object accountObj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (accountObj instanceof Account account) {
+            if (!encoder.matches(passwordDto.getOldPassword(), account.getPassword())) {
+                throw new IncorrectPasswordException();
+            }
+
+            if (passwordDto.getOldPassword().equals(passwordDto.getNewPassword())) {
+                throw new NewPasswordNotDifferentException();
+            }
+
+            String newPasswordEncrypted = encoder.encode(passwordDto.getNewPassword());
+            account.setPassword(newPasswordEncrypted);
+
+            accountRepository.save(account);
         }
     }
 
-    /**
-     * Retrieve id of the user, that is currently logged in.
-     *
-     * @return user's ID if user is authenticated, otherwise null.
-     */
-    public static Long getCurrentUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Long userId = null;
+    public void changeEmailAddress(ChangeEmailAddressDto dto)
+        throws IncorrectEmailAddressException, EmailAddressNotDifferentException, EmailAddressAlreadyTakenException {
+        Object accountObj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if (auth.getPrincipal() instanceof Account) {
-            userId = ((Account) auth.getPrincipal()).getId();
+        if (accountObj instanceof Account account) {
+            if (!Objects.equals(account.getEmailAddress(), dto.getOldEmailAddress())) {
+                throw new IncorrectEmailAddressException();
+            }
+
+            if (Objects.equals(account.getEmailAddress(), dto.getNewEmailAddress())) {
+                throw new EmailAddressNotDifferentException();
+            }
+
+            if (accountRepository.existsByEmailAddress(dto.getNewEmailAddress())) {
+                throw new EmailAddressAlreadyTakenException();
+            }
+
+            account.setEmailAddress(dto.getNewEmailAddress());
+
+            accountRepository.save(account);
         }
-        return userId;
     }
 }
