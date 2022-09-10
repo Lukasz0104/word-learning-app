@@ -105,7 +105,7 @@ class LearningSetItemControllerTest {
         mockMvc.perform(get("/sets/2/items"))
                .andDo(print())
                .andExpect(status().isForbidden())
-               .andExpect(content().string("You have no access to set with id=2"));
+               .andExpect(content().string("You have no access to this set"));
     }
 
     @Test
@@ -132,7 +132,7 @@ class LearningSetItemControllerTest {
         mockMvc.perform(get("/sets/2/items"))
                .andDo(print())
                .andExpect(status().isForbidden())
-               .andExpect(content().string("You have no access to set with id=2"));
+               .andExpect(content().string("You have no access to this set"));
     }
 
     @Test
@@ -141,7 +141,7 @@ class LearningSetItemControllerTest {
         mockMvc.perform(get("/sets/20/items"))
                .andDo(print())
                .andExpect(status().isNotFound())
-               .andExpect(content().string("Learning set with id=20 does not exist!"));
+               .andExpect(content().string("Learning set with id=20 does not exist"));
     }
     // endregion
 
@@ -212,7 +212,7 @@ class LearningSetItemControllerTest {
         mockMvc.perform(get("/sets/2/items/1"))
                .andDo(print())
                .andExpect(status().isForbidden())
-               .andExpect(content().string("You have no access to set with id=2"));
+               .andExpect(content().string("You have no access to this set"));
     }
 
     @Test
@@ -241,7 +241,7 @@ class LearningSetItemControllerTest {
         mockMvc.perform(get("/sets/2/items/1"))
                .andDo(print())
                .andExpect(status().isForbidden())
-               .andExpect(content().string("You have no access to set with id=2"));
+               .andExpect(content().string("You have no access to this set"));
     }
     // endregion
 

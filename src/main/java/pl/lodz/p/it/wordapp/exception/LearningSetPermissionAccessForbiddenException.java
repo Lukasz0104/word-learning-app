@@ -2,6 +2,6 @@ package pl.lodz.p.it.wordapp.exception;
 
 public class LearningSetPermissionAccessForbiddenException extends BaseApplicationException {
     public LearningSetPermissionAccessForbiddenException() {
-        super("Only set owner can access user permissions");
+        super(LEARNING_SET_USERS_PERMISSION_ACCESS_FORBIDDEN);
     }
 }

@@ -73,7 +73,7 @@ public class LearningSetService {
             .orElseThrow(() -> new LearningSetNotFoundException(id));
 
         if (!ls.isPubliclyVisible() && role.isEmpty()) {
-            throw new LearningSetAccessForbiddenException(id);
+            throw new LearningSetAccessForbiddenException();
         }
 
         return ls;
@@ -92,10 +92,10 @@ public class LearningSetService {
     public LearningSetDetailsDto replace(CreateLearningSetDto learningSet, Long id)
         throws LearningSetAccessForbiddenException, LearningSetNotFoundException {
         Role role = getUserRoleForSet(id)
-            .orElseThrow(() -> new LearningSetAccessForbiddenException(id));
+            .orElseThrow(LearningSetAccessForbiddenException::new);
 
         if (role.compareTo(Role.EDITOR) < 0) { // at least Role.EDITOR is required to make changes
-            throw new LearningSetAccessForbiddenException(id);
+            throw new LearningSetAccessForbiddenException();
         }
 
         LearningSet updated = learningSetRepository
@@ -116,12 +116,12 @@ public class LearningSetService {
     public void delete(Long id) throws LearningSetDeletionAccessForbiddenException, LearningSetNotFoundException {
         if (learningSetRepository.existsById(id)) {
             Role role = getUserRoleForSet(id)
-                .orElseThrow(() -> new LearningSetDeletionAccessForbiddenException(id));
+                .orElseThrow(LearningSetDeletionAccessForbiddenException::new);
 
             if (role == Role.OWNER) { // only author can delete
                 learningSetRepository.deleteById(id);
             } else {
-                throw new LearningSetDeletionAccessForbiddenException(id);
+                throw new LearningSetDeletionAccessForbiddenException();
             }
         } else {
             throw new LearningSetNotFoundException(id);

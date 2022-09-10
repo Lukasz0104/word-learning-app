@@ -378,7 +378,7 @@ class LearningSetControllerTest {
         mockMvc.perform(get("/sets/3"))
                .andDo(print())
                .andExpect(status().isForbidden())
-               .andExpect(content().string("You have no access to set with id=3"));
+               .andExpect(content().string("You have no access to this set"));
     }
     // endregion
 

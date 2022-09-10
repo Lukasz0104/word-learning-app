@@ -2,6 +2,6 @@ package pl.lodz.p.it.wordapp.exception;
 
 public class EmailAddressNotDifferentException extends BaseApplicationException {
     public EmailAddressNotDifferentException() {
-        super("New email address must differ from the old email address");
+        super(EMAIL_ADDRESS_NOT_DIFFERENT_FORM_OLD);
     }
 }

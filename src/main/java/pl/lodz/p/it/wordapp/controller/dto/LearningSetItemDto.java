@@ -11,7 +11,7 @@ import pl.lodz.p.it.wordapp.model.LearningSetItem;
 @Getter
 @Setter
 @AllArgsConstructor
-@JsonPropertyOrder({"setID", "itemID", "term", "translation"})
+@JsonPropertyOrder({ "setID", "itemID", "term", "translation" })
 public class LearningSetItemDto implements Serializable {
 
     @JsonProperty("setID")

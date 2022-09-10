@@ -29,10 +29,10 @@ public class CreateLearningSetDto {
 
     public static LearningSet mapToLearningSet(CreateLearningSetDto dto) {
         return LearningSet.builder()
-                .translationLanguage(dto.translationLanguage)
-                .title(dto.title)
-                .termLanguage(dto.termLanguage)
-                .publiclyVisible(dto.publiclyVisible)
-                .build();
+                          .translationLanguage(dto.translationLanguage)
+                          .title(dto.title)
+                          .termLanguage(dto.termLanguage)
+                          .publiclyVisible(dto.publiclyVisible)
+                          .build();
     }
 }

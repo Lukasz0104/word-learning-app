@@ -29,7 +29,7 @@ public class LearningSetItemService {
                                                  .orElseThrow(() -> new LearningSetNotFoundException(setId));
 
         if (!set.isPubliclyVisible() && !permissionService.getPermissions(setId).isAbleToRead()) {
-            throw new LearningSetAccessForbiddenException(setId);
+            throw new LearningSetAccessForbiddenException();
         }
 
         return itemRepository.findByLearningSetItemKey_SetID(setId);
@@ -42,7 +42,7 @@ public class LearningSetItemService {
                                                  .orElseThrow(() -> new LearningSetNotFoundException(setId));
 
         if (!set.isPubliclyVisible() && !permissionService.getPermissions(setId).isAbleToRead()) {
-            throw new LearningSetAccessForbiddenException(setId);
+            throw new LearningSetAccessForbiddenException();
         }
 
         return itemRepository
@@ -55,7 +55,7 @@ public class LearningSetItemService {
         throws LearningSetNotFoundException, LearningSetItemModificationAccessForbiddenException {
 
         if (!permissionService.getPermissions(setId).isAbleToEdit()) {
-            throw new LearningSetItemModificationAccessForbiddenException(setId);
+            throw new LearningSetItemModificationAccessForbiddenException();
         }
 
         LearningSet ls = setRepository
@@ -75,7 +75,7 @@ public class LearningSetItemService {
                LearningSetItemModificationAccessForbiddenException {
 
         if (!permissionService.getPermissions(setId).isAbleToEdit()) {
-            throw new LearningSetItemModificationAccessForbiddenException(setId);
+            throw new LearningSetItemModificationAccessForbiddenException();
         }
 
         if (!setRepository.existsById(setId)) {
@@ -100,7 +100,7 @@ public class LearningSetItemService {
                LearningSetItemModificationAccessForbiddenException {
 
         if (!permissionService.getPermissions(setId).isAbleToEdit()) {
-            throw new LearningSetItemModificationAccessForbiddenException(setId);
+            throw new LearningSetItemModificationAccessForbiddenException();
         }
 
         if (!setRepository.existsById(setId)) {

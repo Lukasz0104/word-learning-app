@@ -26,9 +26,9 @@ public class CreateLearningSetItemDto {
 
         LearningSetItemKey key = new LearningSetItemKey(setID, itemID);
         return LearningSetItem.builder()
-                .learningSetItemKey(key)
-                .term(dto.term)
-                .translation(dto.translation)
-                .build();
+                              .learningSetItemKey(key)
+                              .term(dto.term)
+                              .translation(dto.translation)
+                              .build();
     }
 }

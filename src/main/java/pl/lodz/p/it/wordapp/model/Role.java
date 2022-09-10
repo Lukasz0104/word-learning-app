@@ -16,8 +16,8 @@ public enum Role {
 
     public static Role of(int value) {
         return Stream.of(Role.values())
-                .filter(ar -> ar.value == value)
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+                     .filter(ar -> ar.value == value)
+                     .findFirst()
+                     .orElseThrow(IllegalArgumentException::new);
     }
 }

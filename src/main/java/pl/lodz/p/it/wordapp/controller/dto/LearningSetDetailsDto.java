@@ -30,11 +30,11 @@ public class LearningSetDetailsDto implements Serializable {
 
     public static LearningSet mapToLearningSet(LearningSetDetailsDto dto) {
         return LearningSet.builder()
-                .id(dto.id)
-                .title(dto.title)
-                .publiclyVisible(dto.publiclyVisible)
-                .termLanguage(dto.termLanguage)
-                .translationLanguage(dto.translationLanguage)
-                .build();
+                          .id(dto.id)
+                          .title(dto.title)
+                          .publiclyVisible(dto.publiclyVisible)
+                          .termLanguage(dto.termLanguage)
+                          .translationLanguage(dto.translationLanguage)
+                          .build();
     }
 }

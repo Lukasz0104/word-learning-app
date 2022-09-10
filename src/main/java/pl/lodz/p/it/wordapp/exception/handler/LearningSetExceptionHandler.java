@@ -64,7 +64,7 @@ public class LearningSetExceptionHandler {
     })
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String permissionSelfManagementExceptionHandler(BaseApplicationException ex) {
+    public String badRequestExceptionHandler(BaseApplicationException ex) {
         return ex.getMessage();
     }
 
@@ -77,7 +77,7 @@ public class LearningSetExceptionHandler {
     })
     @ResponseBody
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public String learningSetAccessForbiddenHandler(BaseApplicationException ex) {
+    public String accessForbiddenHandler(BaseApplicationException ex) {
         return ex.getMessage();
     }
 
@@ -87,7 +87,7 @@ public class LearningSetExceptionHandler {
     })
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
-    public String UserAlreadyExistsExceptionHandler(BaseApplicationException ex) {
+    public String alreadyExistsExceptionHandler(BaseApplicationException ex) {
         return ex.getMessage();
     }
 }

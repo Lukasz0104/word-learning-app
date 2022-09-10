@@ -8,13 +8,13 @@ import pl.lodz.p.it.wordapp.model.LearningSetItem;
 import pl.lodz.p.it.wordapp.model.LearningSetItemKey;
 
 public interface LearningSetItemRepository
-        extends JpaRepository<LearningSetItem, LearningSetItemKey> {
+    extends JpaRepository<LearningSetItem, LearningSetItemKey> {
 
     List<LearningSetItemDto> findByLearningSetItemKey_SetID(Long setID);
 
     @Query("SELECT (1 + COALESCE(MAX(l.learningSetItemKey.itemID), 0)) " +
-            "FROM LearningSetItem l " +
-            "WHERE l.learningSetItemKey.setID = ?1")
+        "FROM LearningSetItem l " +
+        "WHERE l.learningSetItemKey.setID = ?1")
     Long findNextId(Long setID);
 
 }

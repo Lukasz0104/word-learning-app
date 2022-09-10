@@ -90,7 +90,7 @@ class AuthenticationControllerTest {
                             .contentType(MediaType.APPLICATION_JSON))
                .andDo(print())
                .andExpect(status().isConflict())
-               .andExpect(content().string("Account with this username already exists"));
+               .andExpect(content().string("This username is already taken"));
     }
 
     @Test
