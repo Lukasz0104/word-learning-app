@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import javax.transaction.Transactional;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -127,12 +128,55 @@ class AuthenticationControllerTest {
                                                   .content(loginCredentials))
                                      .andDo(print())
                                      .andExpect(status().isOk())
+                                     .andExpect(header().exists("Authorization"))
                                      .andReturn();
 
         String header = mvcResult.getResponse().getHeader("Authorization");
 
         assertThat(header).isNotNull()
                           .contains("Bearer ");
+    }
+    // endregion
+
+    // region AuthenticationController::refreshToken
+    @Test
+    void refreshTokenTest() throws Exception {
+        String credentials = String.format(loginCredentialsDtoFormat, "user1", "abc");
+
+        MvcResult loginResponse = mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON)
+                                                                .content(credentials))
+                                         .andDo(print())
+                                         .andExpect(status().isOk())
+                                         .andExpect(header().exists("Authorization"))
+                                         .andReturn();
+
+        String token = loginResponse.getResponse().getHeader("Authorization");
+
+        assertThat(token).isNotNull()
+                         .startsWith("Bearer ");
+
+        // wait a few seconds before refreshing the token
+        TimeUnit.SECONDS.sleep(2);
+
+        MvcResult refreshTokenResponse = mockMvc.perform(post("/refresh-token")
+                                                             .header("Authorization", token))
+                                                .andDo(print())
+                                                .andExpect(status().isNoContent())
+                                                .andExpect(header().exists("Authorization"))
+                                                .andReturn();
+
+        String newToken = refreshTokenResponse.getResponse().getHeader("Authorization");
+
+        assertThat(newToken).isNotNull()
+                            .startsWith("Bearer ")
+                            .isNotEqualTo(token);
+
+        /* TODO verify that old token is invalidated
+        mockMvc.perform(post("/refresh-token")
+                            .header("Authorization", token))
+               .andDo(print())
+               .andExpect(status().isUnauthorized());
+         */
     }
     // endregion
 }
