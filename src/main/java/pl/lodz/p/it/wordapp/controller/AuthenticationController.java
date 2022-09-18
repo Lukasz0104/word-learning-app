@@ -29,10 +29,10 @@ public class AuthenticationController {
     private final PasswordEncoder passwordEncoder;
 
     @Value("${jwt.expirationTime}")
-    long expirationTime;
+    private long expirationTime;
 
     @Value("${jwt.secret}")
-    String secret;
+    private String secret;
 
     /**
      * Empty endpoint to enable authentication in SwaggerUI.

@@ -1,6 +1,7 @@
 package pl.lodz.p.it.wordapp.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -8,9 +9,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import javax.transaction.Transactional;
+import java.sql.Date;
+import java.time.Instant;
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -23,6 +30,9 @@ import org.springframework.test.web.servlet.MvcResult;
 @AutoConfigureMockMvc
 @DirtiesContext
 class AuthenticationControllerTest {
+
+    @Value("${jwt.secret}")
+    private String secret;
 
     private final String registrationDtoFormat = "{" +
         "\"username\": \"%s\"," +
@@ -177,6 +187,46 @@ class AuthenticationControllerTest {
                .andDo(print())
                .andExpect(status().isUnauthorized());
          */
+    }
+    // endregion
+
+    // region authentication with JWT
+    @Test
+    void authenticationWithExpiredTokenTest() throws Exception {
+        Calendar calendar = new Calendar.Builder().setDate(2000, 1, 1)
+                                                  .build();
+        String expiredToken = JWT.create()
+                                 .withSubject("user1")
+                                 .withExpiresAt(calendar.getTime())
+                                 .sign(Algorithm.HMAC256(secret));
+
+        mockMvc.perform(get("/users").header("Authorization", "Bearer " + expiredToken))
+               .andDo(print())
+               .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void authenticationWithAlgorithmMismatchTest() throws Exception {
+        String token = JWT.create()
+                          .withSubject("user1")
+                          .withExpiresAt(Date.from(Instant.now().plusSeconds(30 * 60)))
+                          .sign(Algorithm.HMAC384(secret));
+
+        mockMvc.perform(get("/users").header("Authorization", "Bearer " + token))
+               .andDo(print())
+               .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void authenticationWithInvalidSignatureTest() throws Exception {
+        String token = JWT.create()
+                          .withSubject("user1")
+                          .withExpiresAt(Date.from(Instant.now().plusSeconds(30 * 60)))
+                          .sign(Algorithm.HMAC256(secret + "123"));
+
+        mockMvc.perform(get("/users").header("Authorization", "Bearer " + token))
+               .andDo(print())
+               .andExpect(status().isUnauthorized());
     }
     // endregion
 }

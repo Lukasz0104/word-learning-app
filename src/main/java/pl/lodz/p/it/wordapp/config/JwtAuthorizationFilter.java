@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,10 +48,16 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
         String token = request.getHeader(TOKEN_HEADER);
         if (token != null && token.startsWith(TOKEN_PREFIX)) {
-            String userName = JWT.require(Algorithm.HMAC256(secret))
-                                 .build()
-                                 .verify(token.replace(TOKEN_PREFIX, ""))
-                                 .getSubject();
+            String userName;
+            try {
+                userName = JWT.require(Algorithm.HMAC256(secret))
+                              .build()
+                              .verify(token.replace(TOKEN_PREFIX, ""))
+                              .getSubject();
+            } catch (JWTVerificationException ex) {
+                userName = null;
+            }
+
             if (userName != null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
                 return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
