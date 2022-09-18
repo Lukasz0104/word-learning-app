@@ -4,11 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -17,9 +18,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import pl.lodz.p.it.wordapp.service.AccountService;
+import pl.lodz.p.it.wordapp.service.JWTService;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableScheduling
+@EnableAsync
 @SecurityScheme(
     name = "bearerAuth",
     type = SecuritySchemeType.HTTP,
@@ -33,9 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final RestAuthenticationFailureHandler failureHandler;
 
     private final AccountService userDetailsService;
-
-    @Value("${jwt.secret}")
-    private String secret;
+    private final JWTService jwtService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -63,7 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .addFilter(authenticationFilter())
-            .addFilter(new JwtAuthorizationFilter(authenticationManager(), userDetailsService, secret))
+            .addFilter(new JwtAuthorizationFilter(authenticationManager(), userDetailsService, jwtService))
             .exceptionHandling()
             .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
             .and()

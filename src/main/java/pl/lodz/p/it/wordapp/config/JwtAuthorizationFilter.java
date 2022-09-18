@@ -5,29 +5,28 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
+import java.util.Optional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import pl.lodz.p.it.wordapp.service.JWTService;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private static final String TOKEN_HEADER = "Authorization";
     private static final String TOKEN_PREFIX = "Bearer ";
 
     private final UserDetailsService userDetailsService;
-    private final String secret;
+    private final JWTService jwtService;
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager,
                                   UserDetailsService userDetailsService,
-                                  String secret) {
+                                  JWTService jwtService) {
         super(authenticationManager);
         this.userDetailsService = userDetailsService;
-        this.secret = secret;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -48,18 +47,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
         String token = request.getHeader(TOKEN_HEADER);
         if (token != null && token.startsWith(TOKEN_PREFIX)) {
-            String userName;
-            try {
-                userName = JWT.require(Algorithm.HMAC256(secret))
-                              .build()
-                              .verify(token.replace(TOKEN_PREFIX, ""))
-                              .getSubject();
-            } catch (JWTVerificationException ex) {
-                userName = null;
-            }
+            Optional<String> userName = jwtService.getSubjectFromToken(token.replace(TOKEN_PREFIX, ""));
 
-            if (userName != null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+            if (userName.isPresent()) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userName.get());
                 return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             }
         }

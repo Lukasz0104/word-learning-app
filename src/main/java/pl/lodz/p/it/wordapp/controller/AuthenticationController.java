@@ -1,14 +1,12 @@
 package pl.lodz.p.it.wordapp.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.Date;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
+import java.util.Optional;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +18,7 @@ import pl.lodz.p.it.wordapp.controller.dto.RegistrationDto;
 import pl.lodz.p.it.wordapp.exception.EmailAddressAlreadyTakenException;
 import pl.lodz.p.it.wordapp.exception.UserAlreadyExistsException;
 import pl.lodz.p.it.wordapp.service.AccountService;
+import pl.lodz.p.it.wordapp.service.JWTService;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,12 +26,7 @@ public class AuthenticationController {
 
     private final AccountService accountService;
     private final PasswordEncoder passwordEncoder;
-
-    @Value("${jwt.expirationTime}")
-    private long expirationTime;
-
-    @Value("${jwt.secret}")
-    private String secret;
+    private final JWTService jwtService;
 
     /**
      * Empty endpoint to enable authentication in SwaggerUI.
@@ -52,13 +46,14 @@ public class AuthenticationController {
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/refresh-token")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void refreshToken(HttpServletResponse response,
+    public void refreshToken(HttpServletRequest request,
+                             HttpServletResponse response,
                              Principal principal) {
-        // TODO invalidate old token
-        String token = JWT.create()
-                          .withSubject(principal.getName())
-                          .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
-                          .sign(Algorithm.HMAC256(secret));
-        response.addHeader("Authorization", "Bearer " + token);
+        String oldToken = request.getHeader("Authorization");
+
+        Optional<String> token = jwtService.generateToken(principal.getName());
+        token.ifPresent(newToken -> response.addHeader("Authorization", "Bearer " + newToken));
+
+        jwtService.invalidateToken(oldToken);
     }
 }

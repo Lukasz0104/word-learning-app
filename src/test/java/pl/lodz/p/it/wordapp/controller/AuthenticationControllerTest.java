@@ -160,16 +160,16 @@ class AuthenticationControllerTest {
                                          .andExpect(header().exists("Authorization"))
                                          .andReturn();
 
-        String token = loginResponse.getResponse().getHeader("Authorization");
+        String oldToken = loginResponse.getResponse().getHeader("Authorization");
 
-        assertThat(token).isNotNull()
-                         .startsWith("Bearer ");
+        assertThat(oldToken).isNotNull()
+                            .startsWith("Bearer ");
 
         // wait a few seconds before refreshing the token
         TimeUnit.SECONDS.sleep(2);
 
         MvcResult refreshTokenResponse = mockMvc.perform(post("/refresh-token")
-                                                             .header("Authorization", token))
+                                                             .header("Authorization", oldToken))
                                                 .andDo(print())
                                                 .andExpect(status().isNoContent())
                                                 .andExpect(header().exists("Authorization"))
@@ -179,14 +179,13 @@ class AuthenticationControllerTest {
 
         assertThat(newToken).isNotNull()
                             .startsWith("Bearer ")
-                            .isNotEqualTo(token);
+                            .isNotEqualTo(oldToken);
 
-        /* TODO verify that old token is invalidated
+        // verify that old token is no longer valid
         mockMvc.perform(post("/refresh-token")
-                            .header("Authorization", token))
+                            .header("Authorization", oldToken))
                .andDo(print())
                .andExpect(status().isUnauthorized());
-         */
     }
     // endregion
 
