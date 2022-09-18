@@ -1,15 +1,10 @@
 INSERT INTO ACCOUNT (USERNAME, EMAIL, PASSWORD)
-VALUES ('user1', 'user1@a.com',
-        '$2a$10$mZPg2gNMXJgXpHQ2OPVD4OZAKDYORtApDx3TejDV.P83mskFPt4Lq'), /* password = abc */
-       ('user2', 'user2@b.com',
-        '$2a$10$uWpsBflFJw1yuRa2BHLjNOSrn.gki6aZ5ygqyCPngpbPTVZVFB9/S'), /* password = cba */
-       ('user3', 'user3@c.com',
-        '$2a$10$AqWV7uP25ifbQ6sS7134JeioRKWlxhPu3NDvdyLLY3Qot0G.GuW2u'), /* password = password */
-       ('user4', 'user4@d.com',
-        '$2a$10$TNqra3eqJTd1229a2TVSR.CWK43BkufHLHZfwqb/3HyYdZL5y.Xz6'); /* password = p4$$w0rd */
+VALUES ('user1', 'user1@a.com', '$2a$10$mZPg2gNMXJgXpHQ2OPVD4OZAKDYORtApDx3TejDV.P83mskFPt4Lq'), -- abc
+       ('user2', 'user2@b.com', '$2a$10$uWpsBflFJw1yuRa2BHLjNOSrn.gki6aZ5ygqyCPngpbPTVZVFB9/S'), -- cba
+       ('user3', 'user3@c.com', '$2a$10$AqWV7uP25ifbQ6sS7134JeioRKWlxhPu3NDvdyLLY3Qot0G.GuW2u'), -- password
+       ('user4', 'user4@d.com', '$2a$10$TNqra3eqJTd1229a2TVSR.CWK43BkufHLHZfwqb/3HyYdZL5y.Xz6'); -- p4$$w0rd
 
-INSERT INTO LEARNING_SET
-(TITLE, CREATION_TIME, PUBLICLY_VISIBLE, TERM_LANGUAGE, TRANSLATION_LANGUAGE)
+INSERT INTO LEARNING_SET (TITLE, CREATION_TIME, PUBLICLY_VISIBLE, TERM_LANGUAGE, TRANSLATION_LANGUAGE)
 VALUES ('niemieckie słówka', NOW(), TRUE, 'de', 'pl'),
        ('animals in german', NOW(), FALSE, 'de', 'en'),
        ('polish words', NOW(), FALSE, 'pl', 'en');
