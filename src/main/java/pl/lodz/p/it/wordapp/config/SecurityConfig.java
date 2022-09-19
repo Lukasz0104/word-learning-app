@@ -38,7 +38,6 @@ public class SecurityConfig {
 
     private final ObjectMapper objectMapper;
     private final RestAuthenticationSuccessHandler successHandler;
-    private final RestAuthenticationFailureHandler failureHandler;
 
     private final AccountService userDetailsService;
     private final JWTService jwtService;
@@ -85,7 +84,6 @@ public class SecurityConfig {
     public JsonObjectAuthenticationFilter authenticationFilter(AuthenticationManager authManager) {
         JsonObjectAuthenticationFilter authenticationFilter = new JsonObjectAuthenticationFilter(objectMapper);
         authenticationFilter.setAuthenticationSuccessHandler(successHandler);
-        authenticationFilter.setAuthenticationFailureHandler(failureHandler);
         authenticationFilter.setAuthenticationManager(authManager);
         return authenticationFilter;
     }
