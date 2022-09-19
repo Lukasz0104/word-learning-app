@@ -228,4 +228,30 @@ class AuthenticationControllerTest {
                .andExpect(status().isUnauthorized());
     }
     // endregion
+
+    // region AuthenticationController::logout
+    @Test
+    void logoutTest() throws Exception {
+        String credentials = String.format(loginCredentialsDtoFormat, "user1", "abc");
+
+        MvcResult loginResult = mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON)
+                                                              .content(credentials))
+                                       .andDo(print())
+                                       .andExpect(status().isOk())
+                                       .andExpect(header().exists("Authorization"))
+                                       .andReturn();
+        String authToken = loginResult.getResponse().getHeader("Authorization");
+
+        assertThat(authToken).isNotNull()
+                             .startsWith("Bearer ");
+
+        mockMvc.perform(post("/logout").header("Authorization", authToken))
+               .andDo(print())
+               .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/users").header("Authorization", authToken))
+               .andDo(print())
+               .andExpect(status().isUnauthorized());
+    }
+    // endregion
 }

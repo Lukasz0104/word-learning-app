@@ -56,4 +56,12 @@ public class AuthenticationController {
 
         jwtService.invalidateToken(oldToken);
     }
+
+    /**
+     * Empty endpoint to enable logging out in SwaggerUI.
+     */
+    @SecurityRequirement(name = "bearerAuth")
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout() { }
 }

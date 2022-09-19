@@ -17,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import pl.lodz.p.it.wordapp.service.AccountService;
 import pl.lodz.p.it.wordapp.service.JWTService;
 
@@ -68,6 +69,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilter(new JwtAuthorizationFilter(authenticationManager(), userDetailsService, jwtService))
             .exceptionHandling()
             .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+            .and()
+            .logout()
+            .addLogoutHandler(new RestLogoutHandler(jwtService))
+            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
             .and()
             .headers().frameOptions().disable();
     }
