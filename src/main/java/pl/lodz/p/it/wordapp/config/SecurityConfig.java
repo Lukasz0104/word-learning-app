@@ -10,12 +10,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import pl.lodz.p.it.wordapp.service.AccountService;
@@ -23,6 +25,7 @@ import pl.lodz.p.it.wordapp.service.JWTService;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableWebSecurity
 @EnableScheduling
 @EnableAsync
 @SecurityScheme(
@@ -31,7 +34,7 @@ import pl.lodz.p.it.wordapp.service.JWTService;
     bearerFormat = "JWT",
     scheme = "bearer"
 )
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
     private final ObjectMapper objectMapper;
     private final RestAuthenticationSuccessHandler successHandler;
@@ -45,43 +48,45 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService)
-            .passwordEncoder(passwordEncoder());
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+        throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-        http.authorizeRequests()
-            .antMatchers("/v3/api-docs/**").permitAll()
-            .antMatchers("/swagger-ui/**").permitAll()
-            .antMatchers("/h2-console/**").permitAll()
-            .antMatchers("/register").permitAll()
-            .antMatchers(HttpMethod.GET, "/users").authenticated()
-            .antMatchers(HttpMethod.GET).permitAll()
-            .anyRequest().hasRole("USER")
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .addFilter(authenticationFilter())
-            .addFilter(new JwtAuthorizationFilter(authenticationManager(), userDetailsService, jwtService))
-            .exceptionHandling()
-            .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-            .and()
-            .logout()
-            .addLogoutHandler(new RestLogoutHandler(jwtService))
-            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
-            .and()
-            .headers().frameOptions().disable();
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
+        return http.csrf().disable()
+                   .authorizeRequests()
+                   .antMatchers("/v3/api-docs/**").permitAll()
+                   .antMatchers("/swagger-ui/**").permitAll()
+                   .antMatchers("/h2-console/**").permitAll()
+                   .antMatchers("/register").permitAll()
+                   .antMatchers(HttpMethod.GET, "/users").authenticated()
+                   .antMatchers(HttpMethod.GET).permitAll()
+                   .anyRequest().hasRole("USER")
+                   .and()
+                   .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                   .and()
+                   .addFilter(authenticationFilter(authManager))
+                   .addFilter(new JwtAuthorizationFilter(authManager, userDetailsService, jwtService))
+                   .exceptionHandling()
+                   .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                   .and()
+                   .logout()
+                   .addLogoutHandler(new RestLogoutHandler(jwtService))
+                   .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
+                   .and()
+                   .headers().frameOptions().disable()
+                   .and()
+                   .build();
     }
 
-    public JsonObjectAuthenticationFilter authenticationFilter() throws Exception {
+    public JsonObjectAuthenticationFilter authenticationFilter(AuthenticationManager authManager) {
         JsonObjectAuthenticationFilter authenticationFilter = new JsonObjectAuthenticationFilter(objectMapper);
         authenticationFilter.setAuthenticationSuccessHandler(successHandler);
         authenticationFilter.setAuthenticationFailureHandler(failureHandler);
-        authenticationFilter.setAuthenticationManager(super.authenticationManager());
+        authenticationFilter.setAuthenticationManager(authManager);
         return authenticationFilter;
     }
 }
