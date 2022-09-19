@@ -51,8 +51,9 @@ class AuthenticationControllerTest {
     // region AuthenticationController::register
     @Test
     void registerAndLoginSuccessTest() throws Exception {
-        String loginCredentials = String.format(loginCredentialsDtoFormat, "user5", "secure password");
         String registrationDto = String.format(registrationDtoFormat, "user5", "user5@gmail.com", "secure password");
+        String loginCredentials = String.format(loginCredentialsDtoFormat, "user5", "secure password");
+
         mockMvc.perform(post("/login")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(loginCredentials))
@@ -70,7 +71,7 @@ class AuthenticationControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(loginCredentials))
                .andDo(print())
-               .andExpect(status().isOk())
+               .andExpect(status().isNoContent())
                .andExpect(header().exists("Authorization"));
     }
 
@@ -137,7 +138,7 @@ class AuthenticationControllerTest {
                                                   .contentType(MediaType.APPLICATION_JSON)
                                                   .content(loginCredentials))
                                      .andDo(print())
-                                     .andExpect(status().isOk())
+                                     .andExpect(status().isNoContent())
                                      .andExpect(header().exists("Authorization"))
                                      .andReturn();
 
@@ -156,7 +157,7 @@ class AuthenticationControllerTest {
         MvcResult loginResponse = mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON)
                                                                 .content(credentials))
                                          .andDo(print())
-                                         .andExpect(status().isOk())
+                                         .andExpect(status().isNoContent())
                                          .andExpect(header().exists("Authorization"))
                                          .andReturn();
 
@@ -237,7 +238,7 @@ class AuthenticationControllerTest {
         MvcResult loginResult = mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON)
                                                               .content(credentials))
                                        .andDo(print())
-                                       .andExpect(status().isOk())
+                                       .andExpect(status().isNoContent())
                                        .andExpect(header().exists("Authorization"))
                                        .andReturn();
         String authToken = loginResult.getResponse().getHeader("Authorization");

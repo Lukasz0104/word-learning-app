@@ -2,36 +2,28 @@ package pl.lodz.p.it.wordapp.config;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import org.springframework.beans.factory.annotation.Value;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import pl.lodz.p.it.wordapp.service.JWTService;
 
 @Component
+@RequiredArgsConstructor
 public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private final long expirationTime;
-    private final String secret;
-
-    public RestAuthenticationSuccessHandler(@Value("${jwt.expirationTime}") long expirationTime,
-                                            @Value("${jwt.secret}") String secret) {
-        this.expirationTime = expirationTime;
-        this.secret = secret;
-    }
+    private final JWTService jwtService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) {
-        UserDetails principal = (UserDetails) authentication.getPrincipal();
-        String token = JWT.create()
-                          .withSubject(principal.getUsername())
-                          .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
-                          .sign(Algorithm.HMAC256(secret));
-        response.addHeader("Authorization", "Bearer " + token);
+        Optional<String> token = jwtService.generateToken(authentication.getName());
+
+        token.ifPresent((tokenValue) -> {
+            response.addHeader("Authorization", "Bearer " + tokenValue);
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        });
     }
 }

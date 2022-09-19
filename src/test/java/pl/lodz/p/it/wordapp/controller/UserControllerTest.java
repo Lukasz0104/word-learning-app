@@ -230,7 +230,7 @@ class UserControllerTest {
                                          "\"password\": \"new password\"" +
                                          "}"))
                .andDo(print())
-               .andExpect(status().isOk());
+               .andExpect(status().isNoContent());
     }
 
     @Test
