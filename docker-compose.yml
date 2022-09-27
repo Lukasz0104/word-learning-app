@@ -1,0 +1,19 @@
+services:
+  db:
+    build: ./database
+    expose:
+      - 1433
+    env_file:
+      - .env
+    container_name: db
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+    container_name: app

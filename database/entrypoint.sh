@@ -18,7 +18,7 @@ export MSSQL_SA_PASSWORD=$DB_PASSWORD;
 SQLSERVER_PID=$!;
 
 # Sleep
-sleep 30;
+sleep 20;
 
 # Execute schema.sql
 /opt/mssql-tools/bin/sqlcmd -U SA -P $DB_PASSWORD -i schema.sql;
