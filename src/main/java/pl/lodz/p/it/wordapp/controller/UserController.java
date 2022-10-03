@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,12 +54,5 @@ public class UserController {
     public void updateEmailAddress(@RequestBody @Valid ChangeEmailAddressDto changeEmailAddressDto)
         throws EmailAddressAlreadyTakenException, EmailAddressNotDifferentException, IncorrectEmailAddressException {
         userService.changeEmailAddress(changeEmailAddressDto);
-    }
-
-    @DeleteMapping("/password")
-    // @ResponseStatus(HttpStatus.ACCEPTED)
-    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED) // TODO
-    public void resetPassword() {
-
     }
 }
