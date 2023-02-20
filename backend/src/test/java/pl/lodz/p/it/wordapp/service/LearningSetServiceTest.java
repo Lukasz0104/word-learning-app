@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.annotation.DirtiesContext;
 import pl.lodz.p.it.wordapp.controller.dto.CreateLearningSetDto;
 import pl.lodz.p.it.wordapp.controller.dto.LearningSetDetailsDto;
 import pl.lodz.p.it.wordapp.exception.LearningSetAccessForbiddenException;
@@ -23,6 +24,7 @@ import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
 
 @SpringBootTest
 @Transactional
+@DirtiesContext
 class LearningSetServiceTest {
 
     CreateLearningSetDto updatedLearningSet;

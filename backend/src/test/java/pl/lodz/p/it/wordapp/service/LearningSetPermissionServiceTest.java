@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.annotation.DirtiesContext;
 import pl.lodz.p.it.wordapp.controller.dto.PermissionsDto;
 import pl.lodz.p.it.wordapp.controller.dto.UserPermissionsDto;
 import pl.lodz.p.it.wordapp.exception.LearningSetNotFoundException;
@@ -27,6 +28,7 @@ import pl.lodz.p.it.wordapp.repository.AccessRoleRepository;
 
 @SpringBootTest
 @Transactional
+@DirtiesContext
 class LearningSetPermissionServiceTest {
     private PermissionsDto perm;
 
