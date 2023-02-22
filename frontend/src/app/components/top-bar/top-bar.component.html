@@ -1,0 +1,41 @@
+<nav class="navbar navbar-dark navbar-expand-md bg-primary">
+    <div class="container-lg">
+        <a
+            class="navbar-brand fs-4"
+            [routerLink]="'.'">
+            Word App
+        </a>
+        <button
+            class="navbar-toggler"
+            type="button"
+            aria-controls="navbarNavAltMarkup"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+            (click)="isMenuCollapsed = !isMenuCollapsed">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div
+            [ngbCollapse]="isMenuCollapsed"
+            class="collapse navbar-collapse fs-5">
+            <div
+                class="navbar-nav"
+                (click)="isMenuCollapsed = true">
+                <a
+                    [routerLink]="'.'"
+                    class="nav-link">
+                    Link 1
+                </a>
+                <a
+                    [routerLink]="'.'"
+                    class="nav-link">
+                    Link 2
+                </a>
+                <a
+                    [routerLink]="'.'"
+                    class="nav-link">
+                    Link 3
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>

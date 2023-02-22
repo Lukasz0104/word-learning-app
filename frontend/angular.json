@@ -11,25 +11,30 @@
                 },
                 "@schematics/angular:component": {
                     "skipTests": true,
-                    "style": "none"
+                    "style": "none",
+                    "path": "src/app/components"
                 },
                 "@schematics/angular:directive": {
                     "skipTests": true
                 },
                 "@schematics/angular:guard": {
-                    "skipTests": true
+                    "skipTests": true,
+                    "path": "src/app/guards"
                 },
                 "@schematics/angular:interceptor": {
-                    "skipTests": true
+                    "skipTests": true,
+                    "path": "src/app/interceptors"
                 },
                 "@schematics/angular:pipe": {
                     "skipTests": true
                 },
                 "@schematics/angular:resolver": {
-                    "skipTests": true
+                    "skipTests": true,
+                    "path": "src/app/resolvers"
                 },
                 "@schematics/angular:service": {
-                    "skipTests": true
+                    "skipTests": true,
+                    "path": "src/app/services"
                 }
             },
             "root": "",
@@ -51,6 +56,7 @@
                             "src/assets"
                         ],
                         "styles": [
+                            "node_modules/bootstrap/dist/css/bootstrap.min.css",
                             "src/styles.css"
                         ],
                         "scripts": []
