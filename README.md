@@ -37,7 +37,7 @@ To enable any of those profiles you can either:
 2. Run jar file with option `-Dspring.profiles.active`. For example:
 
     ```bash
-    java -jar -Dspring.profiles.active=h2,swagger target/wordap*.jar`
+    java -jar -Dspring.profiles.active=h2,swagger target/wordap*.jar
     ```
 
 If starting the app with IntelliJ IDEA, you can specify active profiles by modifying run configuration.
