@@ -1,9 +1,11 @@
 <ng-container *ngIf="sets$ | async as sets; else loadingBlock">
-    <div class="container-lg">
+    <div
+        *ngIf="sets.length; else createSetPrompt"
+        class="container-lg">
         <div
-            *ngFor="let set of sets"
             class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3 justify-content-center">
             <div
+                *ngFor="let set of sets"
                 class="col"
                 style="max-width: 320px">
                 <div class="card border-dark h-100">
@@ -13,11 +15,13 @@
                     <div class="card-body">
                         <h6 class="card-text">
                             Learn
-                            <span [ngClass]="'fi fi-' + set.termLanguage">
+                            <span [ngClass]="'fs-5 fi fi-' + set.termLanguage">
                             </span>
                             words from
                             <span
-                                [ngClass]="'fi fi-' + set.translationLanguage">
+                                [ngClass]="
+                                    'fs-5 fi fi-' + set.translationLanguage
+                                ">
                             </span>
                         </h6>
                         <p class="card-text text-muted">
@@ -29,12 +33,24 @@
             </div>
         </div>
     </div>
+    <ng-template #createSetPrompt>
+        <div class="text-center">
+            <h4>No learning sets are currently available.</h4>
+            <a routerLink="new">
+                <button class="btn btn-success">
+                    Go ahead and create new one!
+                </button>
+            </a>
+        </div>
+    </ng-template>
 </ng-container>
 <ng-template #loadingBlock>
-    <p>Loading...</p>
-    <div
-        class="spinner-border text-primary"
-        role="status">
-        <span class="visually-hidden">Loading...</span>
+    <div class="text-center">
+        <h3>Loading...</h3>
+        <div
+            class="spinner-border text-primary"
+            role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
     </div>
 </ng-template>

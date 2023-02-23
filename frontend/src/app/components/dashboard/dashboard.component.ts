@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Component } from '@angular/core';
+import { Observable } from 'rxjs';
 import { LearningSetDetails } from 'src/app/models/learning-set-details';
 import { LearningSetService } from 'src/app/services/learning-set.service';
 
@@ -7,14 +7,10 @@ import { LearningSetService } from 'src/app/services/learning-set.service';
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html'
 })
-export class DashboardComponent implements OnInit {
-    protected readonly sets$ = new BehaviorSubject<LearningSetDetails[]>([]);
+export class DashboardComponent {
+    protected readonly sets$: Observable<LearningSetDetails[]>;
 
-    constructor(private learningSetService: LearningSetService) {}
-
-    ngOnInit(): void {
-        this.learningSetService
-            .fetchSets()
-            .subscribe((data) => this.sets$.next(data));
+    constructor(private learningSetService: LearningSetService) {
+        this.sets$ = this.learningSetService.fetchSets();
     }
 }

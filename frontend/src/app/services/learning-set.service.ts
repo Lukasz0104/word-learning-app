@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, timeout } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
 import { LearningSetDetails } from '../models/learning-set-details';
 
@@ -13,6 +13,11 @@ export class LearningSetService {
     constructor(private http: HttpClient) {}
 
     fetchSets(): Observable<LearningSetDetails[]> {
-        return this.http.get<LearningSetDetails[]>(this.BASE_URL);
+        return this.http.get<LearningSetDetails[]>(this.BASE_URL).pipe(
+            timeout({
+                first: 3000,
+                with: () => []
+            })
+        );
     }
 }
