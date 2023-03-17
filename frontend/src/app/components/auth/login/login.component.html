@@ -1,0 +1,49 @@
+<div class="container-sm">
+    <form
+        class="mx-auto"
+        [formGroup]="loginForm"
+        (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+            <label
+                for="username"
+                class="form-label">
+                Username
+            </label>
+            <input
+                id="username"
+                placeholder="Username"
+                type="text"
+                class="form-control"
+                required
+                formControlName="username" />
+        </div>
+        <div class="mb-3">
+            <label
+                for="password"
+                class="form-label">
+                Password
+            </label>
+            <input
+                id="password"
+                placeholder="Password"
+                type="password"
+                class="form-control"
+                required
+                formControlName="password" />
+        </div>
+        <div class="mb-3">
+            <button
+                class="btn btn-primary"
+                [disabled]="!loginForm.valid">
+                <ng-container *ngIf="isLoading; else signInButton">
+                    <span
+                        class="spinner-border spinner-border-sm"
+                        role="status">
+                    </span>
+                    <span>You are being logged in...</span>
+                </ng-container>
+                <ng-template #signInButton>Sign In</ng-template>
+            </button>
+        </div>
+    </form>
+</div>

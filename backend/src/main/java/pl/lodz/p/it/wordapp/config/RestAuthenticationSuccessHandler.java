@@ -23,6 +23,7 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
 
         token.ifPresent((tokenValue) -> {
             response.addHeader("Authorization", "Bearer " + tokenValue);
+            response.addHeader("Access-Control-Expose-Headers", "*");
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);
         });
     }

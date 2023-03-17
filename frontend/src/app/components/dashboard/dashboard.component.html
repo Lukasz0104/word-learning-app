@@ -8,20 +8,26 @@
                 *ngFor="let set of sets"
                 class="col"
                 style="max-width: 320px">
-                <div class="card border-dark h-100">
+                <div
+                    [routerLink]="'learn/' + set.id"
+                    class="card border-dark h-100">
                     <h5 class="card-header border-dark">
                         {{ set.title }}
                     </h5>
+                    <a
+                        class="stretched-link"
+                        [routerLink]="'learn/' + set.id"></a>
                     <div class="card-body">
                         <h6 class="card-text">
                             Learn
-                            <span [ngClass]="'fs-5 fi fi-' + set.termLanguage">
+                            <span
+                                class="fs-5 fi"
+                                [ngClass]="'fi-' + set.termLanguage">
                             </span>
                             words from
                             <span
-                                [ngClass]="
-                                    'fs-5 fi fi-' + set.translationLanguage
-                                ">
+                                class="fs-5 fi"
+                                [ngClass]="'fi-' + set.translationLanguage">
                             </span>
                         </h6>
                         <p class="card-text text-muted">

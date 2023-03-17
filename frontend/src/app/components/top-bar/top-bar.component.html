@@ -2,7 +2,7 @@
     <div class="container-lg">
         <a
             class="navbar-brand fs-4"
-            [routerLink]="'.'">
+            routerLink="">
             Word App
         </a>
         <button
@@ -18,23 +18,36 @@
             [ngbCollapse]="isMenuCollapsed"
             class="collapse navbar-collapse fs-5">
             <div
-                class="navbar-nav"
+                class="navbar-nav me-auto"
                 (click)="isMenuCollapsed = true">
                 <a
-                    [routerLink]="'.'"
+                    routerLink=""
                     class="nav-link">
                     Link 1
                 </a>
                 <a
-                    [routerLink]="'.'"
+                    routerLink=""
                     class="nav-link">
                     Link 2
                 </a>
+            </div>
+            <div class="navbar-nav">
                 <a
-                    [routerLink]="'.'"
-                    class="nav-link">
-                    Link 3
+                    *ngIf="!authService.isAuthenticated"
+                    routerLink="login"
+                    class="nav-link"
+                    [ngClass]="{
+                        active: router.url === '/login'
+                    }"
+                    (click)="isMenuCollapsed = true">
+                    Login
                 </a>
+                <button
+                    *ngIf="authService.isAuthenticated"
+                    class="btn btn-danger"
+                    (click)="onLogout()">
+                    Logout
+                </button>
             </div>
         </div>
     </div>
