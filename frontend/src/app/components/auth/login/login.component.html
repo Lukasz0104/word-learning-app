@@ -3,7 +3,7 @@
         class="mx-auto"
         [formGroup]="loginForm"
         (ngSubmit)="onSubmit()">
-        <div class="mb-3">
+        <div class="mb-3 has-validation">
             <label
                 for="username"
                 class="form-label">
@@ -15,7 +15,15 @@
                 type="text"
                 class="form-control"
                 required
-                formControlName="username" />
+                formControlName="username"
+                [ngClass]="{
+                    'is-invalid': loginForm.controls.username.invalid
+                }" />
+            <div
+                *ngIf="loginForm.controls.username.invalid"
+                class="invalid-feedback">
+                Username is required.
+            </div>
         </div>
         <div class="mb-3">
             <label
@@ -29,7 +37,15 @@
                 type="password"
                 class="form-control"
                 required
-                formControlName="password" />
+                formControlName="password"
+                [ngClass]="{
+                    'is-invalid': loginForm.controls.password.invalid
+                }" />
+            <div
+                *ngIf="loginForm.controls.password.invalid"
+                class="invalid-feedback">
+                Password is required.
+            </div>
         </div>
         <div class="mb-3">
             <button

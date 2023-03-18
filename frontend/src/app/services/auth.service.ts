@@ -9,10 +9,14 @@ import { LoginCredentials } from '../models/login-credentials';
 })
 export class AuthService {
     private _isAuthenticated = false;
-    private token = '';
+    private _token = '';
 
     get isAuthenticated() {
         return this._isAuthenticated;
+    }
+
+    get token() {
+        return this._token;
     }
 
     constructor(private http: HttpClient) {}
@@ -27,7 +31,7 @@ export class AuthService {
                     const token = res.headers.get('Authorization');
 
                     if (token) {
-                        this.token = token.replace('Bearer ', '');
+                        this._token = token.replace('Bearer ', '');
                         this._isAuthenticated = true;
                     }
 
@@ -38,14 +42,10 @@ export class AuthService {
 
     logout() {
         this.http
-            .post<void>(`${environment.apiUrl}/logout`, null, {
-                headers: {
-                    Authorization: `Bearer ${this.token}`
-                }
-            })
+            .post<void>(`${environment.apiUrl}/logout`, null)
             .subscribe(() => {
                 this._isAuthenticated = false;
-                this.token = '';
+                this._token = '';
             });
     }
 }
