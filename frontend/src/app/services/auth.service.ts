@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs';
+import { Router } from '@angular/router';
+import { catchError, map, of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { LoginCredentials } from '../models/login-credentials';
 
@@ -19,7 +20,7 @@ export class AuthService {
         return this._token;
     }
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient, private router: Router) {}
 
     login(credentials: LoginCredentials) {
         return this.http
@@ -36,7 +37,8 @@ export class AuthService {
                     }
 
                     return !!token;
-                })
+                }),
+                catchError(() => of(false))
             );
     }
 
@@ -46,6 +48,7 @@ export class AuthService {
             .subscribe(() => {
                 this._isAuthenticated = false;
                 this._token = '';
+                this.router.navigate(['login']);
             });
     }
 }

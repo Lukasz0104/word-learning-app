@@ -6,10 +6,12 @@ import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
     selector: 'app-login',
-    templateUrl: './login.component.html'
+    templateUrl: './login.component.html',
+    styles: ['#loginForm { max-width: 500px; }']
 })
 export class LoginComponent {
     protected isLoading = false;
+    protected isAuthFailure = false;
 
     protected loginForm = this.fb.group({
         username: ['', Validators.required],
@@ -24,12 +26,17 @@ export class LoginComponent {
 
     onSubmit() {
         this.isLoading = true;
+        this.isAuthFailure = false;
         this.authService
             .login(this.loginForm.value as LoginCredentials)
-            .subscribe(() => {
+            .subscribe((success) => {
                 this.isLoading = false;
-                this.router.navigate(['']);
+                if (success) {
+                    this.router.navigate(['']);
+                } else {
+                    this.isAuthFailure = true;
+                    this.loginForm.markAsPristine();
+                }
             });
-        // TODO display alert
     }
 }

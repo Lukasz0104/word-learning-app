@@ -1,8 +1,10 @@
 <div class="container-sm">
     <form
+        id="loginForm"
         class="mx-auto"
         [formGroup]="loginForm"
-        (ngSubmit)="onSubmit()">
+        (ngSubmit)="onSubmit()"
+        (input)="isAuthFailure = false">
         <div class="mb-3 has-validation">
             <label
                 for="username"
@@ -49,7 +51,11 @@
         </div>
         <div class="mb-3">
             <button
-                class="btn btn-primary"
+                class="btn"
+                [ngClass]="{
+                    'btn-primary': !isAuthFailure,
+                    'btn-danger': isAuthFailure
+                }"
                 [disabled]="!loginForm.valid">
                 <ng-container *ngIf="isLoading; else signInButton">
                     <span
@@ -62,4 +68,9 @@
             </button>
         </div>
     </form>
+    <ngb-toast
+        *ngIf="isAuthFailure"
+        class="mx-auto text-bg-danger">
+        Invalid username or password.
+    </ngb-toast>
 </div>

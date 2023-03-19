@@ -2,7 +2,8 @@
     <div class="container-lg">
         <a
             class="navbar-brand fs-4"
-            routerLink="">
+            routerLink=""
+            (click)="isMenuCollapsed = true">
             Word App
         </a>
         <button
@@ -45,7 +46,8 @@
                 <button
                     *ngIf="authService.isAuthenticated"
                     class="btn btn-danger"
-                    (click)="onLogout()">
+                    (click)="onLogout()"
+                    (click)="isMenuCollapsed = true">
                     Logout
                 </button>
             </div>
