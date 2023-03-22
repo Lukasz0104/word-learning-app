@@ -6,8 +6,7 @@ import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
     selector: 'app-login',
-    templateUrl: './login.component.html',
-    styles: ['#loginForm { max-width: 500px; }']
+    templateUrl: './login.component.html'
 })
 export class LoginComponent {
     protected isLoading = false;

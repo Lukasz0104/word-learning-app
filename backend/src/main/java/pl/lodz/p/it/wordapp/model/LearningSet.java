@@ -63,7 +63,10 @@ public class LearningSet {
     @Pattern(regexp = "^\s*[a-z]{2}\s*$", message = "Translation language must be a 2 letter language code")
     private String translationLanguage;
 
-    @Formula("(SELECT COUNT(*) FROM LEARNING_SET_ITEM LSI WHERE LSI.SET_ID = id)")
+    @Formula("""
+        (SELECT COUNT(*)
+        FROM LEARNING_SET_ITEM LSI
+        WHERE LSI.SET_ID = id)""")
     private int itemCount;
 
     @ToString.Exclude

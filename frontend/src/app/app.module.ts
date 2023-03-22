@@ -9,6 +9,7 @@ import { LoginComponent } from './components/auth/login/login.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { TopBarComponent } from './components/top-bar/top-bar.component';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
+import { RegisterComponent } from './components/auth/register/register.component';
 
 @NgModule({
     imports: [
@@ -22,7 +23,8 @@ import { JwtInterceptor } from './interceptors/jwt.interceptor';
         AppComponent,
         TopBarComponent,
         DashboardComponent,
-        LoginComponent
+        LoginComponent,
+        RegisterComponent
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }

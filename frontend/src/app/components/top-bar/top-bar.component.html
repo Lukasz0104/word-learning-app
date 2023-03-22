@@ -33,16 +33,26 @@
                 </a>
             </div>
             <div class="navbar-nav">
-                <a
-                    *ngIf="!authService.isAuthenticated"
-                    routerLink="login"
-                    class="nav-link"
-                    [ngClass]="{
-                        active: router.url === '/login'
-                    }"
-                    (click)="isMenuCollapsed = true">
-                    Login
-                </a>
+                <ng-container *ngIf="!authService.isAuthenticated">
+                    <a
+                        routerLink="register"
+                        class="nav-link"
+                        [ngClass]="{
+                            active: router.url === '/register'
+                        }"
+                        (click)="isMenuCollapsed = true">
+                        Register
+                    </a>
+                    <a
+                        routerLink="login"
+                        class="nav-link"
+                        [ngClass]="{
+                            active: router.url === '/login'
+                        }"
+                        (click)="isMenuCollapsed = true">
+                        Login
+                    </a>
+                </ng-container>
                 <button
                     *ngIf="authService.isAuthenticated"
                     class="btn btn-danger"

@@ -12,9 +12,11 @@ public interface LearningSetItemRepository
 
     List<LearningSetItemDto> findByLearningSetItemKey_SetID(Long setID);
 
-    @Query("SELECT (1 + COALESCE(MAX(l.learningSetItemKey.itemID), 0)) " +
-           "FROM LearningSetItem l " +
-           "WHERE l.learningSetItemKey.setID = ?1")
+    @Query("""
+        SELECT (1 + COALESCE(MAX(l.learningSetItemKey.itemID), 0))
+        FROM LearningSetItem l
+        WHERE l.learningSetItemKey.setID = ?1
+        """)
     Long findNextId(Long setID);
 
 }

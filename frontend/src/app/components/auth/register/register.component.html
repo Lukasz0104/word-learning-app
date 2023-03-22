@@ -1,0 +1,124 @@
+<div class="conatiner-sm">
+    <form
+        class="mx-auto max-w-500"
+        [formGroup]="registerForm"
+        (ngSubmit)="onRegister()">
+        <div class="mb-3 has-validation">
+            <label
+                for="usernameInput"
+                class="form-label">
+                Username
+            </label>
+            <input
+                id="usernameInput"
+                type="text"
+                placeholder="Username"
+                formControlName="username"
+                class="form-control"
+                [ngClass]="{
+                    'is-invalid': registerForm.controls.username.invalid
+                }" />
+            <div
+                *ngIf="registerForm.controls.username.invalid"
+                class="invalid-feedback">
+                Username is required.
+            </div>
+        </div>
+        <div class="mb-3 has-validation">
+            <label
+                for="passwordInput"
+                class="form-label">
+                Password
+            </label>
+            <input
+                id="passwordInput"
+                type="password"
+                placeholder="Password"
+                formControlName="password"
+                class="form-control"
+                required
+                minlength="8"
+                [ngClass]="{
+                    'is-invalid': registerForm.controls.password.invalid
+                }" />
+            <div
+                *ngIf="registerForm.controls.password.errors"
+                class="invalid-feedback">
+                <p *ngIf="registerForm.controls.password.errors['required']">
+                    Password is required.
+                </p>
+                <p *ngIf="registerForm.controls.password.errors['minlength']">
+                    Password must be at least 8 characters long.
+                </p>
+            </div>
+        </div>
+        <div class="mb-3 has-validation">
+            <label
+                for="repeatPasswordInput"
+                class="form-label">
+                Repeat password
+            </label>
+            <input
+                id="repeatPasswordInput"
+                formControlName="repeatPassword"
+                type="password"
+                placeholder="Repeat password"
+                class="form-control"
+                required
+                minlength="8"
+                [ngClass]="{
+                    'is-invalid': registerForm.controls.repeatPassword.invalid
+                }" />
+            <div
+                *ngIf="registerForm.controls.repeatPassword.errors"
+                class="invalid-feedback">
+                <p
+                    *ngIf="
+                        registerForm.controls.repeatPassword.errors['required']
+                    ">
+                    Repeat password is required.
+                </p>
+                <p
+                    *ngIf="
+                        registerForm.controls.repeatPassword.errors['minlength']
+                    ">
+                    Repeat password must be at least 8 characters long.
+                </p>
+            </div>
+        </div>
+        <div class="mb-3 has-validation">
+            <label
+                for="emailInput"
+                class="form-label">
+                Email address
+            </label>
+            <input
+                id="emailInput"
+                type="email"
+                formControlName="email"
+                placeholder="Email address"
+                class="form-control"
+                required
+                [ngClass]="{
+                    'is-invalid': registerForm.controls.email.invalid
+                }" />
+            <div
+                *ngIf="registerForm.controls.email.errors"
+                class="invalid-feedback">
+                <p *ngIf="registerForm.controls.email.errors['required']">
+                    Email is required.
+                </p>
+                <p *ngIf="registerForm.controls.email.errors['email']">
+                    Email must be valid.
+                </p>
+            </div>
+        </div>
+        <div class="mb-3">
+            <button
+                class="btn btn-primary"
+                [disabled]="!registerForm.valid">
+                Register
+            </button>
+        </div>
+    </form>
+</div>
