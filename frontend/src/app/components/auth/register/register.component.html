@@ -16,12 +16,12 @@
                 formControlName="username"
                 class="form-control"
                 [ngClass]="{
-                    'is-invalid': registerForm.controls.username.invalid
+                    'is-invalid': usernameControl.invalid
                 }" />
             <div
-                *ngIf="registerForm.controls.username.invalid"
+                *ngIf="usernameControl.invalid"
                 class="invalid-feedback">
-                Username is required.
+                <p class="mb-0">Username is required.</p>
             </div>
         </div>
         <div class="mb-3 has-validation">
@@ -39,16 +39,27 @@
                 required
                 minlength="8"
                 [ngClass]="{
-                    'is-invalid': registerForm.controls.password.invalid
+                    'is-invalid':
+                        passwordControl.invalid || registerForm.errors?.['passwordMismatch']
                 }" />
             <div
-                *ngIf="registerForm.controls.password.errors"
+                *ngIf="passwordControl.errors || registerForm.errors?.['passwordMismatch']"
                 class="invalid-feedback">
-                <p *ngIf="registerForm.controls.password.errors['required']">
+                <p
+                    *ngIf="passwordControl.errors?.['required']"
+                    class="mb-0">
                     Password is required.
                 </p>
-                <p *ngIf="registerForm.controls.password.errors['minlength']">
-                    Password must be at least 8 characters long.
+                <p
+                    *ngIf="passwordControl.errors?.['minlength'] as minLen"
+                    class="mb-0">
+                    Password must be at least
+                    {{ minLen['requiredLength'] }} characters long.
+                </p>
+                <p
+                    *ngIf="registerForm.errors?.['passwordMismatch']"
+                    class="mb-0">
+                    Passwords and repeat password must be the same.
                 </p>
             </div>
         </div>
@@ -67,22 +78,28 @@
                 required
                 minlength="8"
                 [ngClass]="{
-                    'is-invalid': registerForm.controls.repeatPassword.invalid
+                    'is-invalid':
+                        repeatPasswordControl.invalid || passwordMismatchError
                 }" />
             <div
-                *ngIf="registerForm.controls.repeatPassword.errors"
+                *ngIf="repeatPasswordControl.errors || passwordMismatchError"
                 class="invalid-feedback">
                 <p
-                    *ngIf="
-                        registerForm.controls.repeatPassword.errors['required']
-                    ">
+                    *ngIf="repeatPasswordControl.errors?.['required']"
+                    class="mb-0">
                     Repeat password is required.
                 </p>
                 <p
-                    *ngIf="
-                        registerForm.controls.repeatPassword.errors['minlength']
-                    ">
-                    Repeat password must be at least 8 characters long.
+                    *ngIf="repeatPasswordControl.errors?.['minlength'] as minLen"
+                    class="mb-0">
+                    Repeat password must be at least
+                    {{ minLen['requiredLength'] }}
+                    characters long.
+                </p>
+                <p
+                    *ngIf="passwordMismatchError"
+                    class="mb-0">
+                    Passwords and repeat password must be the same.
                 </p>
             </div>
         </div>
@@ -100,16 +117,20 @@
                 class="form-control"
                 required
                 [ngClass]="{
-                    'is-invalid': registerForm.controls.email.invalid
+                    'is-invalid': emailControl.invalid
                 }" />
             <div
-                *ngIf="registerForm.controls.email.errors"
+                *ngIf="emailControl.errors"
                 class="invalid-feedback">
-                <p *ngIf="registerForm.controls.email.errors['required']">
+                <p
+                    *ngIf="emailControl.errors['required']"
+                    class="mb-0">
                     Email is required.
                 </p>
-                <p *ngIf="registerForm.controls.email.errors['email']">
-                    Email must be valid.
+                <p
+                    *ngIf="emailControl.errors['email']"
+                    class="mb-0">
+                    You have to provide a valid email address.
                 </p>
             </div>
         </div>
