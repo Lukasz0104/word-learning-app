@@ -61,6 +61,7 @@ public class SecurityConfig {
                    .antMatchers("/swagger-ui/**").permitAll()
                    .antMatchers("/h2-console/**").permitAll()
                    .antMatchers("/register").permitAll()
+                   .antMatchers(HttpMethod.HEAD, "/users").permitAll()
                    .antMatchers(HttpMethod.GET, "/users").authenticated()
                    .antMatchers(HttpMethod.GET).permitAll()
                    .anyRequest().hasRole("USER")

@@ -32,10 +32,11 @@ import pl.lodz.p.it.wordapp.controller.dto.LearningSetItemDto;
 @DirtiesContext
 class LearningSetItemControllerTest {
 
-    private final String createLearningSetItemDtoFormat = "{" +
-                                                          "\"term\": \"%s\"," +
-                                                          "\"translation\": \"%s\"" +
-                                                          "}";
+    private final String createLearningSetItemDtoFormat = """
+        {
+            "term": "%s",
+            "translation": "%s"
+        }""";
 
     @Autowired
     private MockMvc mockMvc;
@@ -48,7 +49,6 @@ class LearningSetItemControllerTest {
     @WithAnonymousUser
     void allAsAnonymousUserPublicSetTest() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/sets/1/items"))
-
                                      .andExpect(status().isOk())
                                      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                                      .andReturn();
@@ -66,7 +66,6 @@ class LearningSetItemControllerTest {
     @WithUserDetails("user3")
     void allAsUserWithPermissionsTest() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/sets/1/items"))
-
                                      .andExpect(status().isOk())
                                      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                                      .andReturn();
@@ -84,7 +83,6 @@ class LearningSetItemControllerTest {
     @WithUserDetails("user4")
     void allAsUserWithoutPermissionsTest() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/sets/1/items"))
-
                                      .andExpect(status().isOk())
                                      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                                      .andReturn();
@@ -102,7 +100,6 @@ class LearningSetItemControllerTest {
     @WithAnonymousUser
     void allAsAnonymousUserPrivateSetTest() throws Exception {
         mockMvc.perform(get("/sets/2/items"))
-
                .andExpect(status().isForbidden())
                .andExpect(content().string("You have no access to this set"));
     }
@@ -111,7 +108,6 @@ class LearningSetItemControllerTest {
     @WithUserDetails("user1")
     void allAsUserPrivateSetWithPermissionsTest() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/sets/2/items"))
-
                                      .andExpect(status().isOk())
                                      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                                      .andReturn();
@@ -129,7 +125,6 @@ class LearningSetItemControllerTest {
     @WithUserDetails("user3")
     void allAsUserPrivateSetWithoutPermissionsTest() throws Exception {
         mockMvc.perform(get("/sets/2/items"))
-
                .andExpect(status().isForbidden())
                .andExpect(content().string("You have no access to this set"));
     }
@@ -138,7 +133,6 @@ class LearningSetItemControllerTest {
     @WithAnonymousUser
     void allAsUserSetNotExistsTest() throws Exception {
         mockMvc.perform(get("/sets/20/items"))
-
                .andExpect(status().isNotFound())
                .andExpect(content().string("Learning set with id=20 does not exist"));
     }
@@ -149,7 +143,6 @@ class LearningSetItemControllerTest {
     @WithAnonymousUser
     void oneAsAnonymousUserPublicSetTest() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/sets/1/items/1"))
-
                                      .andExpect(status().isOk())
                                      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                                      .andReturn();
@@ -169,7 +162,6 @@ class LearningSetItemControllerTest {
     @WithUserDetails("user2")
     void oneAsUserWithPermissionsPublicSetTest() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/sets/1/items/2"))
-
                                      .andExpect(status().isOk())
                                      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                                      .andReturn();
@@ -189,7 +181,6 @@ class LearningSetItemControllerTest {
     @WithUserDetails("user4")
     void oneAsUserWithoutPermissionsPublicSetTest() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/sets/1/items/3"))
-
                                      .andExpect(status().isOk())
                                      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                                      .andReturn();
@@ -209,7 +200,6 @@ class LearningSetItemControllerTest {
     @WithAnonymousUser
     void oneAsAnonymousUserPrivateSetTest() throws Exception {
         mockMvc.perform(get("/sets/2/items/1"))
-
                .andExpect(status().isForbidden())
                .andExpect(content().string("You have no access to this set"));
     }
@@ -218,7 +208,6 @@ class LearningSetItemControllerTest {
     @WithUserDetails("user2")
     void oneAsUserWithPermissionsPrivateSetTest() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/sets/2/items/1"))
-
                                      .andExpect(status().isOk())
                                      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                                      .andReturn();
@@ -238,7 +227,6 @@ class LearningSetItemControllerTest {
     @WithUserDetails("user3")
     void oneAsUserWithoutPermissionsPrivateTest() throws Exception {
         mockMvc.perform(get("/sets/2/items/1"))
-
                .andExpect(status().isForbidden())
                .andExpect(content().string("You have no access to this set"));
     }
@@ -252,7 +240,6 @@ class LearningSetItemControllerTest {
         mockMvc.perform(post("/sets/1/items")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(createItemDto))
-
                .andExpect(status().isUnauthorized());
     }
 
@@ -263,7 +250,6 @@ class LearningSetItemControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/sets/1/items")
                                                   .contentType(MediaType.APPLICATION_JSON)
                                                   .content(createItemDto))
-
                                      .andExpect(status().isCreated())
                                      .andReturn();
         LearningSetItemDto responseBody = objectMapper.readValue(
@@ -284,7 +270,6 @@ class LearningSetItemControllerTest {
         mockMvc.perform(post("/sets/1/items")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(createItemDto))
-
                .andExpect(status().isForbidden());
     }
 
@@ -295,7 +280,6 @@ class LearningSetItemControllerTest {
         mockMvc.perform(post("/sets/1/items")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(createItemDto))
-
                .andExpect(status().isBadRequest());
     }
     // endregion
@@ -308,7 +292,6 @@ class LearningSetItemControllerTest {
         MvcResult mvcResult = mockMvc.perform(put("/sets/1/items/1")
                                                   .content(createItemDto)
                                                   .contentType(MediaType.APPLICATION_JSON))
-
                                      .andExpect(status().isOk())
                                      .andReturn();
 
@@ -330,7 +313,6 @@ class LearningSetItemControllerTest {
         mockMvc.perform(put("/sets/1/items/1")
                             .content(createItemDto)
                             .contentType(MediaType.APPLICATION_JSON))
-
                .andExpect(status().isForbidden());
     }
 
@@ -341,7 +323,6 @@ class LearningSetItemControllerTest {
         mockMvc.perform(put("/sets/1/items/1")
                             .content(createItemDto)
                             .contentType(MediaType.APPLICATION_JSON))
-
                .andExpect(status().isUnauthorized());
     }
     // endregion
@@ -351,7 +332,6 @@ class LearningSetItemControllerTest {
     @WithAnonymousUser
     void removeAsAnonymousUserTest() throws Exception {
         mockMvc.perform(delete("/sets/1/items/1"))
-
                .andExpect(status().isUnauthorized());
     }
 
@@ -359,7 +339,6 @@ class LearningSetItemControllerTest {
     @WithUserDetails("user1")
     void removeAsUserWithPermissionsTest() throws Exception {
         mockMvc.perform(delete("/sets/1/items/1"))
-
                .andExpect(status().isNoContent());
     }
 
@@ -367,7 +346,6 @@ class LearningSetItemControllerTest {
     @WithUserDetails("user4")
     void removeAsUserWithoutPermissionsTest() throws Exception {
         mockMvc.perform(delete("/sets/1/items/1"))
-
                .andExpect(status().isForbidden());
     }
     // endregion

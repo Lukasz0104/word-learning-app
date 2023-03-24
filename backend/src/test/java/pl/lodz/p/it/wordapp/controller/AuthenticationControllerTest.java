@@ -33,16 +33,18 @@ class AuthenticationControllerTest {
     @Value("${jwt.secret}")
     private String secret;
 
-    private final String registrationDtoFormat = "{" +
-                                                 "\"username\": \"%s\"," +
-                                                 "\"emailAddress\": \"%s\"," +
-                                                 "\"password\": \"%s\"" +
-                                                 "}";
+    private final String registrationDtoFormat = """
+        {
+            "username": "%s",
+            "emailAddress": "%s",
+            "password": "%s"
+        }""";
 
-    private final String loginCredentialsDtoFormat = "{" +
-                                                     "\"username\": \"%s\"," +
-                                                     "\"password\": \"%s\"" +
-                                                     "}";
+    private final String loginCredentialsDtoFormat = """
+        {
+            "username": "%s",
+            "password": "%s"
+        }""";
 
     @Autowired
     private MockMvc mockMvc;
@@ -56,20 +58,17 @@ class AuthenticationControllerTest {
         mockMvc.perform(post("/login")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(loginCredentials))
-
                .andExpect(status().isUnauthorized());
 
         mockMvc.perform(post("/register")
                             .content(registrationDto)
                             .contentType(MediaType.APPLICATION_JSON))
-
                .andExpect(status().isAccepted())
                .andExpect(content().string(""));
 
         mockMvc.perform(post("/login")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(loginCredentials))
-
                .andExpect(status().isNoContent())
                .andExpect(header().exists("Authorization"));
     }
@@ -81,7 +80,6 @@ class AuthenticationControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/register")
                                                   .contentType(MediaType.APPLICATION_JSON)
                                                   .content(registrationDto))
-
                                      .andExpect(status().isBadRequest())
                                      .andReturn();
 
@@ -99,7 +97,6 @@ class AuthenticationControllerTest {
         mockMvc.perform(post("/register")
                             .content(registrationDto)
                             .contentType(MediaType.APPLICATION_JSON))
-
                .andExpect(status().isConflict())
                .andExpect(content().string("This username is already taken"));
     }
@@ -111,7 +108,6 @@ class AuthenticationControllerTest {
         mockMvc.perform(post("/register")
                             .content(registrationDto)
                             .contentType(MediaType.APPLICATION_JSON))
-
                .andExpect(status().isConflict())
                .andExpect(content().string("This email address is already taken"));
     }
@@ -125,7 +121,6 @@ class AuthenticationControllerTest {
         mockMvc.perform(post("/login")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(loginCredentials))
-
                .andExpect(status().isUnauthorized());
     }
 
@@ -136,7 +131,6 @@ class AuthenticationControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/login")
                                                   .contentType(MediaType.APPLICATION_JSON)
                                                   .content(loginCredentials))
-
                                      .andExpect(status().isNoContent())
                                      .andExpect(header().exists("Authorization"))
                                      .andReturn();
@@ -155,7 +149,6 @@ class AuthenticationControllerTest {
 
         MvcResult loginResponse = mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON)
                                                                 .content(credentials))
-
                                          .andExpect(status().isNoContent())
                                          .andExpect(header().exists("Authorization"))
                                          .andReturn();
@@ -170,7 +163,6 @@ class AuthenticationControllerTest {
 
         MvcResult refreshTokenResponse = mockMvc.perform(post("/refresh-token")
                                                              .header("Authorization", oldToken))
-
                                                 .andExpect(status().isNoContent())
                                                 .andExpect(header().exists("Authorization"))
                                                 .andReturn();
@@ -184,7 +176,6 @@ class AuthenticationControllerTest {
         // verify that old token is no longer valid
         mockMvc.perform(post("/refresh-token")
                             .header("Authorization", oldToken))
-
                .andExpect(status().isUnauthorized());
     }
     // endregion
@@ -200,7 +191,6 @@ class AuthenticationControllerTest {
                                  .sign(Algorithm.HMAC256(secret));
 
         mockMvc.perform(get("/users").header("Authorization", "Bearer " + expiredToken))
-
                .andExpect(status().isUnauthorized());
     }
 
@@ -212,7 +202,6 @@ class AuthenticationControllerTest {
                           .sign(Algorithm.HMAC384(secret));
 
         mockMvc.perform(get("/users").header("Authorization", "Bearer " + token))
-
                .andExpect(status().isUnauthorized());
     }
 
@@ -224,7 +213,6 @@ class AuthenticationControllerTest {
                           .sign(Algorithm.HMAC256(secret + "123"));
 
         mockMvc.perform(get("/users").header("Authorization", "Bearer " + token))
-
                .andExpect(status().isUnauthorized());
     }
     // endregion
@@ -236,7 +224,6 @@ class AuthenticationControllerTest {
 
         MvcResult loginResult = mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON)
                                                               .content(credentials))
-
                                        .andExpect(status().isNoContent())
                                        .andExpect(header().exists("Authorization"))
                                        .andReturn();
@@ -246,11 +233,9 @@ class AuthenticationControllerTest {
                              .startsWith("Bearer ");
 
         mockMvc.perform(post("/logout").header("Authorization", authToken))
-
                .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/users").header("Authorization", authToken))
-
                .andExpect(status().isUnauthorized());
     }
     // endregion

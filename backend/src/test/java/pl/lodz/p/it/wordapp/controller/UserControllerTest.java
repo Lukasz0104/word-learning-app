@@ -2,6 +2,7 @@ package pl.lodz.p.it.wordapp.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -44,24 +45,25 @@ class UserControllerTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private final String changePasswordDtoFormat = "{" +
-                                                   "\"oldPassword\": \"%s\"," +
-                                                   "\"newPassword\": \"%s\"," +
-                                                   "\"confirmNewPassword\": \"%s\"" +
-                                                   "}";
+    private final String changePasswordDtoFormat = """
+        {
+            "oldPassword": "%s",
+            "newPassword": "%s",
+            "confirmNewPassword": "%s"
+        }""";
 
-    private final String changeEmailAddressDtoFormat = "{" +
-                                                       "\"oldEmailAddress\": \"%s\"," +
-                                                       "\"newEmailAddress\": \"%s\"," +
-                                                       "\"confirmNewEmailAddress\": \"%s\"" +
-                                                       "}";
+    private final String changeEmailAddressDtoFormat = """
+        {
+            "oldEmailAddress": "%s",
+            "newEmailAddress": "%s",
+            "confirmNewEmailAddress": "%s"
+        }""";
 
     // region findAllUsers
     @Test
     @WithAnonymousUser
     void findAllUsersAsAnonymousUserTest() throws Exception {
         mockMvc.perform(get("/users"))
-
                .andExpect(status().isUnauthorized());
     }
 
@@ -69,7 +71,6 @@ class UserControllerTest {
     @WithUserDetails("user1")
     void findAllUsersAsUserNoParamsTest() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/users"))
-
                                      .andExpect(status().isOk())
                                      .andReturn();
 
@@ -88,7 +89,6 @@ class UserControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/users")
                                                   .param("name", "An"))
-
                                      .andExpect(status().isOk())
                                      .andReturn();
 
@@ -111,7 +111,6 @@ class UserControllerTest {
         mvcResult = mockMvc.perform(get("/users")
                                         .param("page", "1")
                                         .param("size", "16"))
-
                            .andExpect(status().isOk())
                            .andReturn();
 
@@ -125,7 +124,6 @@ class UserControllerTest {
         mvcResult = mockMvc.perform(get("/users")
                                         .param("page", "3")
                                         .param("size", "16"))
-
                            .andExpect(status().isOk())
                            .andReturn();
 
@@ -145,7 +143,6 @@ class UserControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/users")
                                                   .param("page", "-1")
                                                   .param("size", "0"))
-
                                      .andExpect(status().isOk())
                                      .andReturn();
 
@@ -169,7 +166,6 @@ class UserControllerTest {
                                         .param("name", "ma")
                                         .param("page", "0")
                                         .param("size", "15"))
-
                            .andExpect(status().isOk())
                            .andReturn();
 
@@ -184,7 +180,6 @@ class UserControllerTest {
                                         .param("name", "MA")
                                         .param("page", "1")
                                         .param("size", "15"))
-
                            .andExpect(status().isOk())
                            .andReturn();
 
@@ -206,7 +201,6 @@ class UserControllerTest {
         mockMvc.perform(put("/users/password")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(dto))
-
                .andExpect(status().isUnauthorized());
     }
 
@@ -218,17 +212,16 @@ class UserControllerTest {
         mockMvc.perform(put("/users/password")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(dto))
-
                .andExpect(status().isNoContent());
 
         // attempt to log in with new password
         mockMvc.perform(post("/login")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content("{" +
-                                     "\"username\": \"user1\"," +
-                                     "\"password\": \"new password\"" +
-                                     "}"))
-
+                            .content("""
+                                         {
+                                             "username": "user1",
+                                             "password": "new password"
+                                         }"""))
                .andExpect(status().isNoContent());
     }
 
@@ -240,7 +233,6 @@ class UserControllerTest {
         mockMvc.perform(put("/users/password")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(dto))
-
                .andExpect(status().isBadRequest())
                .andExpect(content().string(
                    "{\"confirmPasswordTheSame\":\"Confirm password does not match new password\"}"));
@@ -250,13 +242,12 @@ class UserControllerTest {
     // region updateEmailAddress
     @Test
     @WithAnonymousUser
-    void upateEmailAddressAsAnonymousUserTest() throws Exception {
+    void updateEmailAddressAsAnonymousUserTest() throws Exception {
         String dto = String.format(changeEmailAddressDtoFormat, "user1@a.com", "user1@new.com", "user1@new.com");
 
         mockMvc.perform(put("/users/email")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(dto))
-
                .andExpect(status().isUnauthorized());
     }
 
@@ -268,7 +259,6 @@ class UserControllerTest {
         mockMvc.perform(put("/users/email")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(dto))
-
                .andExpect(status().isNoContent());
     }
 
@@ -280,7 +270,6 @@ class UserControllerTest {
         mockMvc.perform(put("/users/email")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(dto))
-
                .andExpect(status().isBadRequest());
     }
 
@@ -292,7 +281,6 @@ class UserControllerTest {
         mockMvc.perform(put("/users/email")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(dto))
-
                .andExpect(status().isBadRequest());
     }
 
@@ -304,7 +292,6 @@ class UserControllerTest {
         mockMvc.perform(put("/users/email")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(dto))
-
                .andExpect(status().isBadRequest());
     }
 
@@ -316,7 +303,6 @@ class UserControllerTest {
         mockMvc.perform(put("/users/email")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(dto))
-
                .andExpect(status().isConflict())
                .andExpect(content().string("This email address is already taken"));
     }
@@ -329,11 +315,53 @@ class UserControllerTest {
         mockMvc.perform(put("/users/email")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(dto))
-
                .andExpect(status().isBadRequest())
                .andExpect(content().string("New email address must differ from the old email address"));
     }
     // endregion
+
+    //region checkUsernameAvailability
+    @Test
+    void shouldReturn200WhenUsernameIsTakenTest() throws Exception {
+        String username = "user1";
+        mockMvc.perform(head("/users").param("username", username))
+               .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturn404WhenUsernameIsNotTakenTest() throws Exception {
+        String username = "user5";
+        mockMvc.perform(head("/users").param("username", username))
+               .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturn200WhenEmailIsTakenTest() throws Exception {
+        String email = "user1@a.com";
+        mockMvc.perform(head("/users").param("email", email))
+               .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturn404WhenEmailIsNotTakenTest() throws Exception {
+        String email = "user123132@gmail.com";
+        mockMvc.perform(head("/users").param("email", email))
+               .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturn400WhenNeitherParameterIsPassedTest() throws Exception {
+        mockMvc.perform(head("/users"))
+               .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturn400WhenBothParametersArePassedTest() throws Exception {
+        mockMvc.perform(head("/users").param("username", "user1")
+                                      .param("email", "user1@gmail.com"))
+               .andExpect(status().isBadRequest());
+    }
+    //endregion
 
     private void addTestUsers() {
         List<Account> testUsers = new ArrayList<>();

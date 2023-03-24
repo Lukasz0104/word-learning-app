@@ -37,6 +37,14 @@ public class AccountService implements UserDetailsService {
         }
     }
 
+    public boolean existsByUsername(String username) {
+        return repository.existsByUsername(username);
+    }
+
+    public boolean existsByEmailAddress(String email) {
+        return repository.existsByEmailAddress(email);
+    }
+
     /**
      * Retrieve id of the user, that is currently logged in.
      *

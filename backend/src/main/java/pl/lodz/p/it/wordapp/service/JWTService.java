@@ -50,7 +50,7 @@ public class JWTService {
         }
     }
 
-    public Optional<Date> getExpriresAtFromToken(String token) {
+    public Optional<Date> getExpiresAtFromToken(String token) {
         if (invalidatedTokens.containsKey(token)) {
             return Optional.empty();
         }
@@ -74,7 +74,7 @@ public class JWTService {
             tokenWithoutScheme = token;
         }
 
-        Optional<Date> expiresAt = getExpriresAtFromToken(tokenWithoutScheme);
+        Optional<Date> expiresAt = getExpiresAtFromToken(tokenWithoutScheme);
 
         expiresAt.filter(date -> date.after(new Date()))
                  .map(date -> invalidatedTokens.put(tokenWithoutScheme, date));

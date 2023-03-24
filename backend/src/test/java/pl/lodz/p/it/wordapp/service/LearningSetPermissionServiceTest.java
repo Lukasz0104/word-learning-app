@@ -131,7 +131,6 @@ class LearningSetPermissionServiceTest {
         assertTrue(retrievedPermissions.get(0).isAbleToRead());
         assertFalse(retrievedPermissions.get(0).isAbleToProposeChanges());
 
-
         assertEquals(4L, retrievedPermissions.get(1).getUserId());
         assertEquals("user4", retrievedPermissions.get(1).getUsername());
         assertTrue(retrievedPermissions.get(1).isAbleToProposeChanges());
@@ -250,7 +249,7 @@ class LearningSetPermissionServiceTest {
     }
     // endregion
 
-    // region Add Propopose Permission
+    // region Add Propose Permission
     @Test
     @WithUserDetails("user1")
     void addProposePermissionAsOwnerTest()
