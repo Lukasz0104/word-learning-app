@@ -1,9 +1,10 @@
-<div class="conatiner-sm">
+<div class="container-sm">
     <form
         class="mx-auto max-w-500"
         [formGroup]="registerForm"
-        (ngSubmit)="onRegister()">
-        <div class="mb-3 has-validation">
+        (ngSubmit)="onRegister()"
+        (input)="isSuccess = null">
+        <div class="mb-2 mb-md-3 has-validation">
             <label
                 for="usernameInput"
                 class="form-label">
@@ -15,16 +16,47 @@
                 placeholder="Username"
                 formControlName="username"
                 class="form-control"
+                maxlength="20"
                 [ngClass]="{
-                    'is-invalid': usernameControl.invalid
+                    'is-invalid': usernameControl.invalid,
+                    'is-valid': usernameControl.valid
                 }" />
             <div
-                *ngIf="usernameControl.invalid"
+                *ngIf="usernameControl.errors"
                 class="invalid-feedback">
-                <p class="mb-0">Username is required.</p>
+                <p
+                    *ngIf="usernameControl.errors['required']"
+                    class="mb-0">
+                    Username is required.
+                </p>
+                <p
+                    *ngIf="usernameControl.errors['maxlength']"
+                    class="mb-0">
+                    Username must be at most
+                    {{ usernameControl.errors['maxlength']['requiredLength'] }}
+                    characters long.
+                </p>
+                <p
+                    *ngIf="usernameControl.errors['usernameTaken']"
+                    class="mb-0">
+                    This username is not avaliable.
+                </p>
+            </div>
+            <div *ngIf="usernameControl.pending">
+                <span
+                    class="spinner-border spinner-border-sm me-1"
+                    role="status">
+                    <span class="visually-hidden">Checking availability</span>
+                </span>
+                <span>Checking availability...</span>
+            </div>
+            <div
+                *ngIf="usernameControl.valid"
+                class="valid-feedback">
+                This username is avaliable.
             </div>
         </div>
-        <div class="mb-3 has-validation">
+        <div class="mb-2 mb-md-3 has-validation">
             <label
                 for="passwordInput"
                 class="form-label">
@@ -40,7 +72,8 @@
                 minlength="8"
                 [ngClass]="{
                     'is-invalid':
-                        passwordControl.invalid || registerForm.errors?.['passwordMismatch']
+                        passwordControl.invalid || passwordMismatchError,
+                    'is-valid': passwordControl.valid
                 }" />
             <div
                 *ngIf="passwordControl.errors || registerForm.errors?.['passwordMismatch']"
@@ -62,8 +95,13 @@
                     Passwords and repeat password must be the same.
                 </p>
             </div>
+            <div
+                *ngIf="passwordControl.valid && !passwordMismatchError"
+                class="valid-feedback">
+                Passwords match.
+            </div>
         </div>
-        <div class="mb-3 has-validation">
+        <div class="mb-2 mb-md-3 has-validation">
             <label
                 for="repeatPasswordInput"
                 class="form-label">
@@ -79,7 +117,8 @@
                 minlength="8"
                 [ngClass]="{
                     'is-invalid':
-                        repeatPasswordControl.invalid || passwordMismatchError
+                        repeatPasswordControl.invalid || passwordMismatchError,
+                    'is-valid': passwordControl.valid
                 }" />
             <div
                 *ngIf="repeatPasswordControl.errors || passwordMismatchError"
@@ -102,8 +141,13 @@
                     Passwords and repeat password must be the same.
                 </p>
             </div>
+            <div
+                *ngIf="repeatPasswordControl.valid && !passwordMismatchError"
+                class="valid-feedback">
+                Passwords match.
+            </div>
         </div>
-        <div class="mb-3 has-validation">
+        <div class="mb-2 mb-md-3 has-validation">
             <label
                 for="emailInput"
                 class="form-label">
@@ -112,12 +156,13 @@
             <input
                 id="emailInput"
                 type="email"
-                formControlName="email"
+                formControlName="emailAddress"
                 placeholder="Email address"
                 class="form-control"
                 required
                 [ngClass]="{
-                    'is-invalid': emailControl.invalid
+                    'is-invalid': emailControl.invalid,
+                    'is-valid': emailControl.valid
                 }" />
             <div
                 *ngIf="emailControl.errors"
@@ -132,14 +177,57 @@
                     class="mb-0">
                     You have to provide a valid email address.
                 </p>
+                <p
+                    *ngIf="emailControl.errors['emailTaken']"
+                    class="mb-0">
+                    This username is not avaliable.
+                </p>
+            </div>
+            <div *ngIf="emailControl.pending">
+                <span
+                    class="spinner-border spinner-border-sm me-1"
+                    role="status">
+                    <span class="visually-hidden">Checking availability</span>
+                </span>
+                <span>Checking availability...</span>
+            </div>
+            <div
+                *ngIf="emailControl.valid"
+                class="valid-feedback">
+                This email address is avaliable.
             </div>
         </div>
-        <div class="mb-3">
+        <div class="mb-2 mb-md-3">
             <button
-                class="btn btn-primary"
+                class="btn"
+                [ngClass]="{
+                    'btn-primary': isSuccess !== false,
+                    'btn-danger': isSuccess === false
+                }"
                 [disabled]="!registerForm.valid">
-                Register
+                <ng-container *ngIf="isLoading; else registerButton">
+                    <span
+                        class="spinner-border spinner-border-sm"
+                        role="status">
+                    </span>
+                    <span>You are being registered...</span>
+                </ng-container>
+                <ng-template #registerButton>Register</ng-template>
             </button>
         </div>
     </form>
+    <ngb-toast
+        *ngIf="isSuccess === false"
+        class="mx-auto text-bg-danger">
+        <h6 class="fw-bold mb-0">
+            Failed to register due to the following reason:
+        </h6>
+        <p class="mb-0">{{ registrationFailureReason }}</p>
+    </ngb-toast>
+    <ngb-toast
+        *ngIf="isSuccess"
+        class="mx-auto text-center text-bg-success">
+        <h6 class="fw-bold mb-0">Registration successful.</h6>
+        <p class="mb-0">You can login now.</p>
+    </ngb-toast>
 </div>

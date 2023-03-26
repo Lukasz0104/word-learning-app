@@ -1,9 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, map, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { LoginCredentials } from '../models/login-credentials';
+import { RegistrationDto } from '../models/registration-dto';
 
 @Injectable({
     providedIn: 'root'
@@ -50,5 +51,39 @@ export class AuthService {
                 this._token = '';
                 this.router.navigate(['login']);
             });
+    }
+
+    register(dto: RegistrationDto): Observable<string> {
+        return this.http
+            .post(`${environment.apiUrl}/register`, dto, {
+                responseType: 'text'
+            })
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    return of(err.error as string);
+                })
+            );
+    }
+
+    checkUsername(username: string): Observable<boolean> {
+        return this.http
+            .head(`${environment.apiUrl}/users`, {
+                params: { username }
+            })
+            .pipe(
+                map(() => false),
+                catchError(() => of(true))
+            );
+    }
+
+    checkEmailAddress(email: string): Observable<boolean> {
+        return this.http
+            .head(`${environment.apiUrl}/users`, {
+                params: { email }
+            })
+            .pipe(
+                map(() => false),
+                catchError(() => of(true))
+            );
     }
 }
