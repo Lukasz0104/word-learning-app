@@ -1,26 +1,9 @@
 import { Component } from '@angular/core';
-import {
-    AbstractControl,
-    FormControl,
-    FormGroup,
-    ValidationErrors,
-    ValidatorFn,
-    Validators
-} from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { EmailAvaliableValidator } from 'src/app/validators/email-avaliable.validator';
+import { repeatPasswordValidator } from 'src/app/validators/repeat-password.validator';
 import { UsernameAvaliableValidator } from 'src/app/validators/username-avaliable.validator';
-
-const passwordMatchingValidator: ValidatorFn = (
-    control: AbstractControl
-): ValidationErrors | null => {
-    const password = control.get('password');
-    const repeatPassword = control.get('repeatPassword');
-
-    return password && repeatPassword && password.value === repeatPassword.value
-        ? null
-        : { passwordMismatch: true };
-};
 
 @Component({
     selector: 'app-register',
@@ -68,7 +51,7 @@ export class RegisterComponent {
                 ]
             })
         },
-        { validators: passwordMatchingValidator }
+        { validators: repeatPasswordValidator }
     );
 
     constructor(
