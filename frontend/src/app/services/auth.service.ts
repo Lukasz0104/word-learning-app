@@ -1,7 +1,8 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, map, Observable, of } from 'rxjs';
+import jwt_decode, { JwtPayload } from 'jwt-decode';
+import { Observable, catchError, map, of } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { LoginCredentials } from '../models/login-credentials';
 import { RegistrationDto } from '../models/registration-dto';
@@ -12,6 +13,7 @@ import { RegistrationDto } from '../models/registration-dto';
 export class AuthService {
     private _isAuthenticated = false;
     private _token = '';
+    private _username = '';
 
     get isAuthenticated() {
         return this._isAuthenticated;
@@ -19,6 +21,10 @@ export class AuthService {
 
     get token() {
         return this._token;
+    }
+
+    get username() {
+        return this._username;
     }
 
     constructor(private http: HttpClient, private router: Router) {}
@@ -33,6 +39,8 @@ export class AuthService {
                     const token = res.headers.get('Authorization');
 
                     if (token) {
+                        this._username =
+                            jwt_decode<JwtPayload>(token).sub ?? '';
                         this._token = token.replace('Bearer ', '');
                         this._isAuthenticated = true;
                     }
