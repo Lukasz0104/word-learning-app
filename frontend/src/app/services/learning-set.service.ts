@@ -20,4 +20,8 @@ export class LearningSetService {
             })
         );
     }
+
+    fetchOne(id: number) {
+        return this.http.get<LearningSetDetails>(`${this.BASE_URL}/${id}`);
+    }
 }

@@ -1,0 +1,30 @@
+<ng-container *ngIf="set$ | async as set; else loadingBlock">
+    <div>
+        <h1>{{ set.title }}</h1>
+        <h5 class="text-secondary">
+            {{ set.itemCount }}
+            {{ set.itemCount === 1 ? 'item' : 'items' }}
+        </h5>
+    </div>
+    <div *ngIf="items$ | async as items">
+        <div
+            *ngFor="let item of items"
+            class="card mb-1">
+            <div class="card-body">
+                <div class="row row-cols-1 row-cols-sm-2">
+                    <div class="col">
+                        <p class="card-text">
+                            {{ item.term }}
+                        </p>
+                    </div>
+                    <div class="col">
+                        <p class="card-text">
+                            {{ item.translation }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>
+<ng-template #loadingBlock> </ng-template>
