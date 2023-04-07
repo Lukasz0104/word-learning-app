@@ -1,6 +1,7 @@
 package pl.lodz.p.it.wordapp.controller.dto;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,6 +19,7 @@ public class LearningSetDetailsDto implements Serializable {
     private String termLanguage;
     private String translationLanguage;
     private int itemCount;
+    private LocalDateTime creationTime;
 
     public LearningSetDetailsDto(LearningSet learningSet) {
         this.id = learningSet.getId();
@@ -26,6 +28,7 @@ public class LearningSetDetailsDto implements Serializable {
         this.termLanguage = learningSet.getTermLanguage();
         this.translationLanguage = learningSet.getTranslationLanguage();
         this.itemCount = learningSet.getItemCount();
+        this.creationTime = learningSet.getCreationTime();
     }
 
     public static LearningSet mapToLearningSet(LearningSetDetailsDto dto) {

@@ -1,30 +1,63 @@
-<ng-container *ngIf="set$ | async as set; else loadingBlock">
-    <div>
-        <h1>{{ set.title }}</h1>
-        <h5 class="text-secondary">
-            {{ set.itemCount }}
-            {{ set.itemCount === 1 ? 'item' : 'items' }}
-        </h5>
-    </div>
-    <div *ngIf="items$ | async as items">
-        <div
-            *ngFor="let item of items"
-            class="card mb-1">
-            <div class="card-body">
-                <div class="row row-cols-1 row-cols-sm-2">
-                    <div class="col">
-                        <p class="card-text">
-                            {{ item.term }}
-                        </p>
-                    </div>
-                    <div class="col">
-                        <p class="card-text">
-                            {{ item.translation }}
-                        </p>
+<ng-container *ngIf="true; else accessForbidden">
+    <ng-container
+        *ngIf="{
+            set: set$ | async,
+            items: items$ | async
+        } as data">
+        <ng-container *ngIf="data.set as set; else loadingBlock">
+            <div class="mb-3">
+                <h1>{{ set.title }}</h1>
+                <h6 class="text-secondary">
+                    {{ set.itemCount }}
+                    {{ set.itemCount === 1 ? 'item' : 'items' }}
+                    <i class="bi bi-dot"></i>
+                    {{ set.creationTime | date : 'medium' }}
+                </h6>
+            </div>
+            <hr />
+            <div *ngIf="data.items as items">
+                <div
+                    *ngFor="let item of items"
+                    class="card mb-1">
+                    <div class="card-body">
+                        <div class="row row-cols-1 row-cols-sm-2">
+                            <div class="col">
+                                <p class="card-text">
+                                    {{ item.term }}
+                                </p>
+                            </div>
+                            <div class="col">
+                                <p class="card-text">
+                                    {{ item.translation }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </ng-container>
+        <ng-template #loadingBlock>
+            <div class="text-center">
+                <div
+                    class="spinner-border text-primary"
+                    role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h3>Loading...</h3>
+            </div>
+        </ng-template>
+    </ng-container>
 </ng-container>
-<ng-template #loadingBlock> </ng-template>
+<ng-template #accessForbidden>
+    <div class="text-center">
+        <h1 class="text-danger text-center">
+            <i class="bi bi-sign-stop-fill"></i>
+        </h1>
+        <h3>You have no access to this page.</h3>
+        <button
+            class="btn btn-primary"
+            routerLink="">
+            Return to home page.
+        </button>
+    </div>
+</ng-template>

@@ -5,4 +5,5 @@ export interface LearningSetDetails {
     termLanguage: string;
     translationLanguage: string;
     itemCount: number;
+    creationTime: Date;
 }

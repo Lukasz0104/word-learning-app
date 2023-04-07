@@ -49,7 +49,7 @@ public class LearningSet {
     @Column(name = "PUBLICLY_VISIBLE")
     private boolean publiclyVisible;
 
-    @Column(name = "CREATION_TIME")
+    @Column(name = "CREATION_TIME", updatable = false)
     @JsonIgnore
     private final LocalDateTime creationTime = LocalDateTime.now();
 
