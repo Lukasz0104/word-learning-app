@@ -4,15 +4,51 @@
             set: set$ | async,
             items: items$ | async
         } as data">
-        <ng-container *ngIf="data.set as set; else loadingBlock">
+        <div *ngIf="data.set as set; else loadingBlock">
             <div class="mb-3">
-                <h1>{{ set.title }}</h1>
-                <h6 class="text-secondary">
+                <div class="d-flex justify-content-between">
+                    <h1>{{ set.title }}</h1>
+                    <div
+                        *ngIf="permissions.ableToProposeChanges"
+                        ngbDropdown
+                        placement="bottom-end">
+                        <h5
+                            class="pt-1"
+                            ngbDropdownToggle>
+                            <i class="bi bi-gear"></i>
+                        </h5>
+                        <div ngbDropdownMenu>
+                            <button
+                                *ngIf="permissions.ableToProposeChanges"
+                                ngbDropdownItem>
+                                <i class="bi bi-pencil-square"></i>
+                                Suggest changes
+                            </button>
+                            <ng-container *ngIf="permissions.ableToEdit">
+                                <button ngbDropdownItem>
+                                    <i class="bi bi-search"></i>
+                                    Browse suggestions
+                                </button>
+                                <button ngbDropdownItem>
+                                    <i class="bi bi-pen-fill"></i>
+                                    Edit
+                                </button>
+                            </ng-container>
+                            <button
+                                *ngIf="permissions.ableToManage"
+                                ngbDropdownItem>
+                                <i class="bi bi-person-fill-gear"></i>
+                                Manage access
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-secondary">
                     {{ set.itemCount }}
                     {{ set.itemCount === 1 ? 'item' : 'items' }}
                     <i class="bi bi-dot"></i>
                     {{ set.creationTime | date : 'medium' }}
-                </h6>
+                </p>
             </div>
             <hr />
             <div *ngIf="data.items as items">
@@ -35,7 +71,7 @@
                     </div>
                 </div>
             </div>
-        </ng-container>
+        </div>
         <ng-template #loadingBlock>
             <div class="text-center">
                 <div
