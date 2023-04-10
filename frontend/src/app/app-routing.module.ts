@@ -12,9 +12,8 @@ const routes: Routes = [
     { path: 'register', component: RegisterComponent },
     {
         path: 'sets/:id',
-        component: SetComponent,
         resolve: { permissions: permissionResolver },
-        children: []
+        children: [{ path: '', component: SetComponent }]
     },
     { path: '**', redirectTo: '' }
 ];

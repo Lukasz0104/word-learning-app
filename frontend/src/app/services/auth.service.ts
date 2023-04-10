@@ -11,9 +11,16 @@ import { RegistrationDto } from '../models/registration-dto';
     providedIn: 'root'
 })
 export class AuthService {
+    private readonly TOKEN_KEY = '__token';
+    private readonly USERNAME_KEY = '__username';
+
+    private tokenRefreshInterval = 45 * 60 * 1000; // 45 mins
+
     private _isAuthenticated = false;
     private _token = '';
     private _username = '';
+
+    private intervalId = -1;
 
     get isAuthenticated() {
         return this._isAuthenticated;
@@ -27,7 +34,18 @@ export class AuthService {
         return this._username;
     }
 
-    constructor(private http: HttpClient, private router: Router) {}
+    constructor(private http: HttpClient, private router: Router) {
+        this._token = localStorage.getItem(this.TOKEN_KEY) || '';
+        this._username = localStorage.getItem(this.USERNAME_KEY) || '';
+
+        this._isAuthenticated = !!this._token && !!this._username;
+
+        if (this._isAuthenticated) {
+            this.intervalId = window.setInterval(() => {
+                this.refreshToken();
+            }, this.tokenRefreshInterval);
+        }
+    }
 
     login(credentials: LoginCredentials) {
         return this.http
@@ -37,12 +55,11 @@ export class AuthService {
             .pipe(
                 map((res) => {
                     const token = res.headers.get('Authorization');
-
                     if (token) {
-                        this._username =
-                            jwt_decode<JwtPayload>(token).sub ?? '';
-                        this._token = token.replace('Bearer ', '');
-                        this._isAuthenticated = true;
+                        this.handleToken(token);
+                        this.intervalId = window.setInterval(() => {
+                            this.refreshToken();
+                        }, this.tokenRefreshInterval);
                     }
 
                     return !!token;
@@ -57,6 +74,12 @@ export class AuthService {
             .subscribe(() => {
                 this._isAuthenticated = false;
                 this._token = '';
+                this._username = '';
+
+                this.clearLocalStorage();
+
+                window.clearInterval(this.intervalId);
+
                 this.router.navigate(['login']);
             });
     }
@@ -71,6 +94,36 @@ export class AuthService {
                     return of(err.error as string);
                 })
             );
+    }
+
+    private refreshToken() {
+        // this.http
+        //     .post(`${environment.apiUrl}/refresh-token`, null, {
+        //         observe: 'response'
+        //     })
+        //     .pipe(
+        //         tap((res) => {
+        //             const token = res.headers.get('Authorization');
+        //             if (token) {
+        //                 this.handleToken(token);
+        //             }
+        //         })
+        //     )
+        //     .subscribe();
+    }
+
+    private handleToken(token: string): void {
+        this._username = jwt_decode<JwtPayload>(token).sub ?? '';
+        this._token = token.replace('Bearer ', '');
+        this._isAuthenticated = true;
+
+        localStorage.setItem(this.TOKEN_KEY, this._token);
+        localStorage.setItem(this.USERNAME_KEY, this.username);
+    }
+
+    private clearLocalStorage() {
+        localStorage.removeItem(this.TOKEN_KEY);
+        localStorage.removeItem(this.USERNAME_KEY);
     }
 
     checkUsername(username: string): Observable<boolean> {
