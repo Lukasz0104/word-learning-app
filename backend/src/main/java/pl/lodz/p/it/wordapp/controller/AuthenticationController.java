@@ -52,7 +52,10 @@ public class AuthenticationController {
         String oldToken = request.getHeader("Authorization");
 
         Optional<String> token = jwtService.generateToken(principal.getName());
-        token.ifPresent(newToken -> response.addHeader("Authorization", "Bearer " + newToken));
+        token.ifPresent(newToken -> {
+            response.addHeader("Authorization", "Bearer " + newToken);
+            response.addHeader("Access-Control-Expose-Headers", "*");
+        });
 
         jwtService.invalidateToken(oldToken);
     }

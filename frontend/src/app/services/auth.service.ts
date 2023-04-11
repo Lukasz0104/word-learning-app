@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import jwt_decode, { JwtPayload } from 'jwt-decode';
-import { Observable, catchError, map, of } from 'rxjs';
+import { Observable, catchError, map, of, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { LoginCredentials } from '../models/login-credentials';
 import { RegistrationDto } from '../models/registration-dto';
@@ -14,7 +14,7 @@ export class AuthService {
     private readonly TOKEN_KEY = '__token';
     private readonly USERNAME_KEY = '__username';
 
-    private tokenRefreshInterval = 45 * 60 * 1000; // 45 mins
+    private tokenRefreshInterval = 30 * 60 * 1000; // 30 mins
 
     private _isAuthenticated = false;
     private _token = '';
@@ -97,19 +97,19 @@ export class AuthService {
     }
 
     private refreshToken() {
-        // this.http
-        //     .post(`${environment.apiUrl}/refresh-token`, null, {
-        //         observe: 'response'
-        //     })
-        //     .pipe(
-        //         tap((res) => {
-        //             const token = res.headers.get('Authorization');
-        //             if (token) {
-        //                 this.handleToken(token);
-        //             }
-        //         })
-        //     )
-        //     .subscribe();
+        this.http
+            .post(`${environment.apiUrl}/refresh-token`, null, {
+                observe: 'response'
+            })
+            .pipe(
+                tap((res) => {
+                    const token = res.headers.get('Authorization');
+                    if (token) {
+                        this.handleToken(token);
+                    }
+                })
+            )
+            .subscribe();
     }
 
     private handleToken(token: string): void {
